@@ -1,0 +1,109 @@
+{
+	"meta": {
+		"generatedAt": "2026-10-21T21:54:27.723Z",
+		"tasksAnalyzed": 12,
+		"totalTasks": 12,
+		"analysisCount": 12,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": false
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "Initialize Python Project with uv",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down Python project initialization into: 1) Create pyproject.toml with production/dev dependencies and tool configurations (ruff, mypy, pytest); 2) Create src/smart_hospitals/ package structure with __init__.py files for data/, dashboard/, mcp_server/ modules; 3) Create supporting directories (data/, notebooks/, tests/, docs/) with .gitkeep files; 4) Update .gitignore with Python patterns and .pre-commit-config.yaml placeholders for future hooks. Verify each step with appropriate commands (uv sync, import checks).",
+			"reasoning": "This is a greenfield project with no existing pyproject.toml, src/, or Python structure. The task is well-documented with exact directory structure and dependencies. Complexity is moderate because: (1) uv is a straightforward tool for project init, (2) the structure is clearly defined in the task details, (3) no complex configuration decisions needed, (4) existing .pre-commit-config.yaml needs minor updates. The main effort is creating the correct directory structure and ensuring all dependencies install correctly."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "Create Data Extraction Script",
+			"complexityScore": 3,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down extraction script creation into: 1) Create scripts/extract_infodengue.py with URL construction and pandas CSV fetching from InfoDengue API; 2) Implement logging to stderr (week count, date range, file size); 3) Write unit tests in tests/scripts/test_extract_infodengue.py with mocked HTTP responses using pytest fixtures. Execute the script once to generate the initial data/dengue_sp_snapshot.csv for subsequent tasks.",
+			"reasoning": "Straightforward ETL script with a single API endpoint. The InfoDengue API returns CSV directly, so pandas.read_csv(url) handles most of the work. Complexity is low because: (1) well-documented API parameters in task details, (2) no authentication required, (3) simple logging requirements, (4) pseudo-code provided. Main considerations are proper error handling and ensuring the script doesn't break if the API format changes slightly."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Implement Data Module with Indicator Calculations",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down data module implementation into: 1) Create loader.py with load_snapshot() validation (required columns, date parsing) and get_reference_date(); 2) Create indicators.py dataclasses (SituacaoAtual, Tendencia) and calcular_situacao_atual() with weekly variation calculation; 3) Implement calcular_tendencia() with trend logic (alta/estavel/queda based on Rt and p_rt1 thresholds); 4) Implement serie_historica() and comparativo_sazonal() with SE filtering and cross-year comparison; 5) Create comprehensive tests in tests/data/ covering all functions, edge cases (single row, empty ranges), and achieving >=80% coverage.",
+			"reasoning": "Core business logic module shared by dashboard and MCP. Complexity is moderate-high because: (1) four distinct indicator calculations with specific logic, (2) edge cases like single-row DataFrames, empty date ranges, (3) type definitions with Literal types and dataclasses, (4) comprehensive testing required (80% coverage). The task provides detailed pseudo-code which reduces ambiguity, but the test suite is substantial (10+ test cases specified)."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Create Jupyter Notebook for Data Analysis",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down notebook creation into: 1) Data overview section - load snapshot, display statistics, data types, sample rows; 2) Time series analysis - plot casos_est over time with alert level color bands and outbreak annotations; 3) Seasonal patterns - create heatmap (weeks x years), box plots by month, identify high/low seasons; 4) Recent trends and visualization proposals - Rt time series, correlation analysis, proposed dashboard visualizations list, and create docs/visualizacoes.md template for human approval.",
+			"reasoning": "Exploratory data analysis is relatively straightforward but requires domain understanding. Complexity is moderate because: (1) seven distinct analysis sections required, (2) multiple visualization types (heatmaps, time series, box plots), (3) must integrate with the data module from Task 3, (4) creates a template for human approval. The output drives dashboard design, so quality matters, but no strict acceptance criteria beyond 'executes without errors'."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Aprovação humana 1: escolher visualizações do dashboard",
+			"complexityScore": 1,
+			"recommendedSubtasks": 0,
+			"expansionPrompt": "This is a human-only task requiring manual review and approval. No subtasks needed - the agent cannot perform this work. The agent can only verify that docs/visualizacoes.md template exists (created in Task 4) and remind the human to fill it out.",
+			"reasoning": "This is explicitly a human-only task - the agent creates the template but cannot fill in the visualization choices. The task is a blocking checkpoint that requires manual human intervention. Complexity is minimal for the agent (just verification that template exists)."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Implement Streamlit Dashboard",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down dashboard implementation into: 1) Create app.py skeleton with Streamlit config, data loading with @st.cache_data, and mandatory reference date display in header; 2) Read docs/visualizacoes.md and implement each approved visualization using Plotly (exact implementation depends on human approval); 3) Create responsive layout with st.columns and proper spacing for approved charts; 4) Create __main__.py entry point and add dashboard script to pyproject.toml; 5) Create smoke test in tests/dashboard/test_app.py using streamlit.testing.v1.AppTest to verify app loads without exceptions.",
+			"reasoning": "Dashboard complexity is high because: (1) depends on human approval (Task 5) - exact visualizations unknown until then, (2) must integrate Streamlit, Plotly, and the data module correctly, (3) responsive layout considerations, (4) smoke testing with streamlit.testing requires specific setup. The mandatory element (reference date) is simple, but the visualization implementation is open-ended until docs/visualizacoes.md is filled. The task wisely avoids pre-defining charts."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Aprovação humana 2: validar design do protótipo do dashboard",
+			"complexityScore": 1,
+			"recommendedSubtasks": 0,
+			"expansionPrompt": "This is a human-only task requiring manual validation of the running dashboard prototype. No subtasks needed - the agent provides instructions for running locally (uv run streamlit run ...) and applies requested adjustments in separate tasks. The agent cannot perform the approval itself.",
+			"reasoning": "Another human-only blocking checkpoint. The agent's role is limited to providing run instructions and implementing any feedback in follow-up tasks. Complexity is minimal for the agent."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Publish Dashboard to Streamlit Community Cloud",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down deployment into: 1) Create requirements.txt for Streamlit Cloud (pandas, streamlit, plotly with minimum versions); 2) Create .streamlit/config.toml with theme and server settings; 3) Document Streamlit Cloud configuration steps (connect repo, set main file path, Python version) - actual deployment requires human action in Streamlit Cloud UI; 4) Create verification checklist (HTTP 200, load time <5s, all charts render, reference date correct) and update README with deployment URL.",
+			"reasoning": "Deployment to Streamlit Cloud involves configuration files and manual steps in the Streamlit Cloud UI. Complexity is moderate because: (1) requirements.txt is separate from pyproject.toml, (2) theme configuration, (3) verification criteria (load time, rendering), (4) README update. The actual cloud deployment requires human action (connecting GitHub repo), which reduces agent complexity."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Implement MCP Server with FastMCP",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down MCP server implementation into: 1) Create server.py skeleton with FastMCP Server, stdio transport setup, logging to stderr only, and data loading at startup; 2) Implement situacao_atual() tool with data_referencia in response; 3) Implement tendencia(semanas) tool with parameter validation (1-52 range) and trend logic; 4) Implement serie_historica(inicio, fim) and comparativo_sazonal(semana) tools with SE format validation; 5) Add logging for each tool call (name, params, duration, success/error per RNF02); 6) Create comprehensive unit tests in tests/mcp_server/ testing valid responses, parameter validation errors, and stderr-only logging, targeting >=80% coverage.",
+			"reasoning": "MCP server is complex because: (1) FastMCP SDK requires understanding the MCP protocol, (2) stdio transport has strict stdout/stderr separation requirements (RNF02), (3) four tools with different parameters and validation, (4) comprehensive logging requirements, (5) unit tests must verify async functions and logging behavior. The provided pseudo-code is extensive but requires adaptation to actual FastMCP API. The stdout cleanliness requirement is critical and easy to violate."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Write Comprehensive Tests",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down integration testing into: 1) Create tests/integration/test_mcp_integration.py with fixtures for StdioServerParameters to start MCP server as subprocess; 2) Implement integration tests for list_tools (verify four tools) and each tool response (verify data_referencia field); 3) Create tests/integration/test_mcp_stdout_clean.py to verify stdout contains only valid JSON-RPC messages; 4) Configure pytest in pyproject.toml with coverage settings targeting data module and MCP server, verify combined coverage >=80% with --cov-fail-under=80.",
+			"reasoning": "Integration testing is moderately complex because: (1) requires starting MCP server as subprocess via mcp SDK client, (2) async test execution with pytest-asyncio, (3) stdout/stderr parsing for protocol compliance, (4) coverage aggregation across data module and MCP server. Unit tests are already covered in Tasks 3 and 9; this task focuses on end-to-end verification. The JSON-RPC parsing test is particularly tricky."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "Configure Pre-commit Hooks and CI Quality Gates",
+			"complexityScore": 4,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down pre-commit configuration into: 1) Update .pre-commit-config.yaml to add ruff-pre-commit hooks (ruff check with --fix, ruff-format); 2) Add local hooks for mypy (uv run mypy src/) and pytest (uv run pytest --cov --cov-fail-under=80); 3) Configure ruff and mypy in pyproject.toml with Python 3.12 target, appropriate lint rules, and ignore rules for third-party libraries. Verify with `uv run pre-commit run --all-files`.",
+			"reasoning": "Pre-commit configuration is straightforward but requires careful integration. Complexity is moderate because: (1) existing .pre-commit-config.yaml needs updating (not creating from scratch), (2) ruff and mypy configurations must align with project conventions, (3) test hook must pass before being committed. The block-main hook already exists. Main risk is hook configuration that blocks legitimate commits."
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "Write Documentation and README",
+			"complexityScore": 3,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down documentation into: 1) Update README.md with installation instructions (uv, clone, sync), snapshot update command, and local dashboard run command; 2) Document MCP server connection to Claude Desktop including claude_desktop_config.json example and tool descriptions; 3) Add project structure explanation, data source attribution (InfoDengue), and example MCP usage scenario from PRD section 3. Verify all code blocks execute correctly.",
+			"reasoning": "Documentation is straightforward but must be comprehensive and accurate. Complexity is low because: (1) the README template already exists, (2) most content is provided in the task details, (3) no code to write, just documentation. Dependencies on Tasks 2, 6, 8, 9, 10 ensure all features exist before documenting. Main effort is ensuring accuracy of commands and URLs."
+		}
+	]
+}

@@ -29,7 +29,7 @@ Observação: nesta fase o MCP informa a situação atual e indicadores de tend�
 de casos futuros (ver Fora de escopo).
 
 ## 4. Escopo (nesta versão)
-- Script de extração que baixa da API do InfoDengue os dados de dengue do município de São Paulo
+- Script de extração em Python que baixa da API do InfoDengue os dados de dengue do município de São Paulo
   (capital, código IBGE 3550308), da semana epidemiológica 1 de 2010 até a mais recente, e salva um
   snapshot CSV versionado no repositório.
 - Análise dos dados via Jupyter notebook, com sugestões de visualizações para o painel.
@@ -46,7 +46,8 @@ de casos futuros (ver Fora de escopo).
 - Modelo de previsão de casos futuros (previsto para uma fase seguinte).
 - Publicação do MCP server na internet (transporte HTTP); nesta fase ele roda apenas localmente via stdio.
 - Outros municípios além da capital paulista e outras doenças (chikungunya, zika).
-- Atualização automática dos dados; o snapshot é atualizado manualmente, rodando o script de extração.
+- Atualização automática dos dados; o snapshot é atualizado sob demanda, executando manualmente o script
+  de extração.
 
 ## 6. Requisitos funcionais
 - RF01: Dashboard publicado
@@ -92,7 +93,7 @@ MCP server: SDK oficial `mcp` para Python (FastMCP), transporte stdio, execuçã
 Qualidade: pytest + pytest-cov (testes), ruff (lint e formatação), mypy (checagem de tipos), executados
 também via pre-commit.
 
-Dados: snapshot CSV versionado no repositório, gerado por um script de extração a partir da API do
+Dados: snapshot CSV versionado no repositório, gerado pelo script de extração a partir da API do
 InfoDengue (município de São Paulo, IBGE 3550308, dengue, desde 2010). Dashboard, MCP e testes leem
 apenas o snapshot; nenhum deles depende da API em tempo de execução.
 
@@ -119,7 +120,7 @@ respostas do MCP devem sempre informar essa data de referência.
 Falhas de layout
 Falhas de resposta do MCP
 Dados desatualizados: o snapshot envelhece. Mitigação: data de referência sempre visível no dashboard e
-presente nas respostas do MCP; script de extração documentado para atualização manual.
+presente nas respostas do MCP; script de extração documentado para atualização sob demanda.
 Semanas recentes incompletas: atraso de notificação faz as últimas semanas parecerem em queda.
 Mitigação: usar casos_est (nowcast) com intervalo para as semanas recentes.
 

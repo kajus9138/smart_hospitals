@@ -542,7 +542,7 @@
         "id": "10",
         "title": "Write Comprehensive Tests",
         "description": "Implement integration tests for the MCP server: (1) start MCP server as subprocess via stdio using the MCP SDK client, verify list_tools returns the four tools and each one responds with valid data including reference date; (2) verify stdout contains only MCP protocol messages; (3) ensure >= 80% coverage on data module and MCP server with pytest-cov (--cov-fail-under=80).",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "3",
           "9"
@@ -580,7 +580,7 @@
             "dependencies": [
               1
             ],
-            "details": "Create tests/integration/test_mcp_stdout_clean.py with test_mcp_server_stdout_contains_only_protocol_messages. Use subprocess.Popen to start the server, send a JSON-RPC initialize request via stdin, capture stdout/stderr with timeout, then parse each non-empty stdout line as JSON and assert it contains 'jsonrpc' key. Fail the test if any line is not valid JSON-RPC. Allow stderr to contain logs per RNF02.",
+            "details": "Create tests/integration/test_mcp_stdout_clean.py with test_mcp_server_stdout_contains_only_protocol_messages. Use subprocess.Popen to start the server, send a JSON-RPC initialize request via stdin, capture stdout/stderr with timeout, then parse each non-empty stdout line as JSON and assert it contains 'jsonrpc' key. Fail the test if any line is not valid JSON-RPC. Allow stderr to contain logs per RNF02.\n<info added on 2026-10-22T14:54:56.823Z>\nRaw stdout test issue: closing stdin right after sending requests caused the server to cancel in-progress tools/call (only ids 1,3,4,8 arrived). Fix: read responses until all expected ids are received, only then close stdin. threading.Timer (30s) kills the process if it hangs. Does not use pytest-asyncio (uses anyio + mcp.Client like task 9). fail_under=80 was already configured in [tool.coverage.report] in pyproject.toml.\n</info added on 2026-10-22T14:54:56.823Z>",
             "status": "pending",
             "testStrategy": "Run `uv run pytest tests/integration/test_mcp_stdout_clean.py -v` and verify the test passes. Manually inspect that stderr contains logs while stdout contains only JSON-RPC formatted messages.",
             "parentId": "undefined"
@@ -601,7 +601,8 @@
         ],
         "complexity": 6,
         "recommendedSubtasks": 4,
-        "expansionPrompt": "Break down integration testing into: 1) Create tests/integration/test_mcp_integration.py with fixtures for StdioServerParameters to start MCP server as subprocess; 2) Implement integration tests for list_tools (verify four tools) and each tool response (verify data_referencia field); 3) Create tests/integration/test_mcp_stdout_clean.py to verify stdout contains only valid JSON-RPC messages; 4) Configure pytest in pyproject.toml with coverage settings targeting data module and MCP server, verify combined coverage >=80% with --cov-fail-under=80."
+        "expansionPrompt": "Break down integration testing into: 1) Create tests/integration/test_mcp_integration.py with fixtures for StdioServerParameters to start MCP server as subprocess; 2) Implement integration tests for list_tools (verify four tools) and each tool response (verify data_referencia field); 3) Create tests/integration/test_mcp_stdout_clean.py to verify stdout contains only valid JSON-RPC messages; 4) Configure pytest in pyproject.toml with coverage settings targeting data module and MCP server, verify combined coverage >=80% with --cov-fail-under=80.",
+        "updatedAt": "2026-10-22T14:58:58.721Z"
       },
       {
         "id": "11",
@@ -712,9 +713,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-10-22T14:44:17.951Z",
+      "lastModified": "2026-10-22T14:58:58.721Z",
       "taskCount": 12,
-      "completedCount": 4,
+      "completedCount": 5,
       "tags": [
         "master"
       ]

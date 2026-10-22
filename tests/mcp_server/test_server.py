@@ -1,8 +1,7 @@
-"""Testes do MCP server: tools via cliente em memória e um teste de fumaça via stdio."""
+"""Testes do MCP server com cliente em memória (o stdio fica em tests/integration)."""
 
 import logging
 import runpy
-import sys
 import time
 from collections.abc import AsyncIterator
 from typing import Any
@@ -10,26 +9,18 @@ from typing import Any
 import pandas as pd
 import pytest
 from mcp import Client
-from mcp.client.stdio import StdioServerParameters
-from mcp.types import CallToolResult, TextContent
 
-from smart_hospitals.data import get_reference_date
 from smart_hospitals.mcp_server import server
+from tests.mcp_helpers import TOOLS, error_text
 
 pytestmark = pytest.mark.anyio
 
-TOOLS = {"situacao_atual", "tendencia", "serie_historica", "comparativo_sazonal"}
 VALID_CALLS: list[tuple[str, dict[str, Any]]] = [
     ("situacao_atual", {}),
     ("tendencia", {}),
     ("serie_historica", {"inicio": "202401", "fim": "202405"}),
     ("comparativo_sazonal", {}),
 ]
-
-
-@pytest.fixture
-def anyio_backend() -> str:
-    return "asyncio"
 
 
 @pytest.fixture
@@ -48,10 +39,6 @@ async def call(client: Client, tool: str, args: dict[str, Any]) -> dict[str, Any
     content: dict[str, Any] | None = result.structured_content
     assert content is not None
     return content
-
-
-def error_text(result: CallToolResult) -> str:
-    return " ".join(c.text for c in result.content if isinstance(c, TextContent))
 
 
 async def test_lists_the_four_tools(client: Client) -> None:
@@ -211,18 +198,6 @@ async def test_each_tool_answers_under_one_second_with_real_snapshot() -> None:
             start = time.perf_counter()
             await call(mcp_client, tool, args)
             assert time.perf_counter() - start < 1.0, tool
-
-
-async def test_stdio_smoke() -> None:
-    """Sobe o servidor como subprocesso e conversa pelo stdio, como faria um cliente MCP."""
-    params = StdioServerParameters(
-        command=sys.executable, args=["-m", "smart_hospitals.mcp_server"]
-    )
-    async with Client(params) as mcp_client:
-        tools = await mcp_client.list_tools()
-        assert {tool.name for tool in tools.tools} == TOOLS
-        result = await call(mcp_client, "situacao_atual", {})
-    assert result["data_referencia"] == str(get_reference_date(server.get_data()))
 
 
 def test_main_loads_snapshot_then_runs_stdio(

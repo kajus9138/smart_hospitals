@@ -7,6 +7,12 @@ import pytest
 
 
 @pytest.fixture
+def anyio_backend() -> str:
+    """Backend dos testes async (plugin anyio do pytest)."""
+    return "asyncio"
+
+
+@pytest.fixture
 def sample_dengue_data() -> pd.DataFrame:
     """Cinco semanas fixas de 2024 (sem acesso à rede)."""
     return pd.DataFrame(

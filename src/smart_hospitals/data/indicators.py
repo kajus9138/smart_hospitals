@@ -24,6 +24,10 @@ SERIE_COLUMNS = [
 ]
 
 
+class ParametroInvalido(ValueError):
+    """Parâmetro informado pelo usuário fora do formato ou do intervalo aceito."""
+
+
 @dataclass
 class SituacaoAtual:
     data_referencia: str
@@ -69,7 +73,7 @@ def _parse_bound(value: str | int) -> pd.Timestamp | int:
     try:
         return pd.Timestamp(datetime.strptime(text, "%Y-%m-%d"))
     except ValueError:
-        raise ValueError(
+        raise ParametroInvalido(
             f"Valor inválido {value!r}: use SE (AAAASS) ou data (AAAA-MM-DD)"
         ) from None
 
@@ -111,7 +115,7 @@ def calcular_tendencia(df: pd.DataFrame, semanas: int = 4) -> Tendencia:
     """
     _require_rows(df)
     if semanas < 1:
-        raise ValueError(f"semanas deve ser >= 1, recebido {semanas}")
+        raise ParametroInvalido(f"semanas deve ser >= 1, recebido {semanas}")
     recent = df.tail(semanas)
     rt_medio = float(recent["Rt"].mean())
     p_rt1_medio = float(recent["p_rt1"].mean())
@@ -144,7 +148,7 @@ def serie_historica(df: pd.DataFrame, inicio: str | int, fim: str | int) -> list
         _check_order(low <= high, inicio, fim)
         mask = (df["SE"] >= low) & (df["SE"] <= high)
     else:
-        raise ValueError(
+        raise ParametroInvalido(
             "inicio e fim devem usar o mesmo formato: SE (AAAASS) ou data (AAAA-MM-DD)"
         )
     return _to_records(df[mask], SERIE_COLUMNS)
@@ -152,7 +156,7 @@ def serie_historica(df: pd.DataFrame, inicio: str | int, fim: str | int) -> list
 
 def _check_order(ordered: bool, inicio: str | int, fim: str | int) -> None:
     if not ordered:
-        raise ValueError(f"inicio ({inicio}) é posterior a fim ({fim})")
+        raise ParametroInvalido(f"inicio ({inicio}) é posterior a fim ({fim})")
 
 
 def comparativo_sazonal(df: pd.DataFrame, semana: int | None = None) -> dict[str, Any]:
@@ -167,7 +171,7 @@ def comparativo_sazonal(df: pd.DataFrame, semana: int | None = None) -> dict[str
     if semana is None:
         semana = latest_se % 100
     if not 1 <= semana <= 53:
-        raise ValueError(f"semana deve estar entre 1 e 53, recebido {semana}")
+        raise ParametroInvalido(f"semana deve estar entre 1 e 53, recebido {semana}")
 
     same_week = df[df["SE"] % 100 == semana]
     anos = same_week["SE"] // 100

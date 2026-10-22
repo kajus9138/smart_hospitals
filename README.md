@@ -49,6 +49,7 @@ entre `dashboard/` e `mcp_server/`); testes em `tests/`.
 ```bash
 uv sync                                   # cria o .venv com dependências de produção e dev
 uv run pytest --cov                       # testes (cobertura mínima de 80%)
+uv run pytest -m "not integration"        # pula os testes que sobem o MCP via stdio
 uv run ruff check . && uv run mypy .      # lint e tipos
 uv run ruff format .                      # formatação
 pre-commit install                        # hooks: ruff, mypy, testes e bloqueio da main

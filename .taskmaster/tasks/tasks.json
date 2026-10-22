@@ -208,7 +208,7 @@
         "id": "4",
         "title": "Create Jupyter Notebook for Data Analysis",
         "description": "Develop an exploratory data analysis notebook that analyzes the InfoDengue data and proposes visualization options for the dashboard, to be reviewed and approved by the human responsible.",
-        "status": "pending",
+        "status": "in-progress",
         "dependencies": [
           "2",
           "3"
@@ -222,10 +222,11 @@
             "title": "Create Data Overview Section",
             "description": "Implement the first section of the Jupyter notebook that loads the dengue snapshot data and displays basic statistics, data types, and sample rows.",
             "dependencies": [],
-            "details": "Create `notebooks/analise_dengue_sp.ipynb` and implement the Data Overview section:\n\n1. Import required libraries (pandas, numpy, matplotlib, seaborn, plotly)\n2. Load snapshot using the data module: `from smart_hospitals.data.loader import load_snapshot`\n3. Display basic statistics:\n   - Date range (min/max of data_iniSE)\n   - Total number of epidemiological weeks\n   - Missing values count per column using `df.isnull().sum()`\n4. Show data types with `df.dtypes`\n5. Display sample rows with `df.head()` and `df.tail()`\n6. Add markdown cells explaining each output and the data source (InfoDengue API for São Paulo)",
-            "status": "pending",
+            "details": "Create `notebooks/analise_dengue_sp.ipynb` and implement the Data Overview section:\n\n1. Import required libraries (pandas, numpy, matplotlib, seaborn, plotly)\n2. Load snapshot using the data module: `from smart_hospitals.data.loader import load_snapshot`\n3. Display basic statistics:\n   - Date range (min/max of data_iniSE)\n   - Total number of epidemiological weeks\n   - Missing values count per column using `df.isnull().sum()`\n4. Show data types with `df.dtypes`\n5. Display sample rows with `df.head()` and `df.tail()`\n6. Add markdown cells explaining each output and the data source (InfoDengue API for São Paulo)\n<info added on 2026-10-22T15:29:38.276Z>\nSection 1 completed: Period from 2010-01-03 to 2026-10-04, 875 consecutive epidemiological weeks (years with 53 weeks: 2014, 2020, 2025), data types displayed, sample rows shown, missing values identified (only casos_est_max has gaps, 40 weeks across 2015/2024/2025), and annual totals computed. Implementation uses load_snapshot and get_reference_date from smart_hospitals.data module as specified.\n</info added on 2026-10-22T15:29:38.276Z>",
+            "status": "done",
             "testStrategy": "Verify cell executes without errors, all statistics display correctly, and data loads successfully from the snapshot CSV",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T15:29:45.189Z"
           },
           {
             "id": 2,
@@ -234,10 +235,11 @@
             "dependencies": [
               1
             ],
-            "details": "Add Time Series Analysis section to the notebook:\n\n1. Plot casos_est over the full time series using Plotly for interactivity\n2. Add color bands to highlight alert level changes:\n   - Green (nivel=1): Normal\n   - Yellow (nivel=2): Attention\n   - Orange (nivel=3): Alert\n   - Red (nivel=4): Critical\n3. Annotate major outbreaks (peaks above a threshold, e.g., 95th percentile)\n4. Add secondary axis showing alert levels\n5. Include markdown cells explaining:\n   - What casos_est represents (estimated cases)\n   - How alert levels are determined by InfoDengue\n   - Key observations from the visualization",
-            "status": "pending",
+            "details": "Add Time Series Analysis section to the notebook:\n\n1. Plot casos_est over the full time series using Plotly for interactivity\n2. Add color bands to highlight alert level changes:\n   - Green (nivel=1): Normal\n   - Yellow (nivel=2): Attention\n   - Orange (nivel=3): Alert\n   - Red (nivel=4): Critical\n3. Annotate major outbreaks (peaks above a threshold, e.g., 95th percentile)\n4. Add secondary axis showing alert levels\n5. Include markdown cells explaining:\n   - What casos_est represents (estimated cases)\n   - How alert levels are determined by InfoDengue\n   - Key observations from the visualization\n<info added on 2026-10-22T15:30:03.387Z>\nThe notebook has been fully implemented with Section 2 (Time Series Analysis). Let me verify the specific implementation details mentioned in the user request by examining the relevant cells more closely.\n\nSection 2 completed: casos_est plotted on log scale with alert level bands (118 continuous segments) and outbreak annotations (years with annual total > 2x annual median: 2014, 2015, 2019, 2023, 2024, 2025). Linear scale comparison shows that 2024 flattens all other years. Implementation uses faixas_de_nivel() function to calculate continuous alert level segments and annotates peak week of each outbreak year. Recommendation recorded: dashboard main series should use log scale or default to recent time window (e.g., last 2-3 years) with option to view full series.\n</info added on 2026-10-22T15:30:03.387Z>",
+            "status": "done",
             "testStrategy": "Verify Plotly chart renders correctly with all color bands visible, annotations appear at outbreak peaks, and interactive features work",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T15:30:10.268Z"
           },
           {
             "id": 3,
@@ -246,10 +248,11 @@
             "dependencies": [
               1
             ],
-            "details": "Add Seasonal Patterns section to the notebook:\n\n1. Create heatmap visualization:\n   - X-axis: Epidemiological weeks (1-52)\n   - Y-axis: Years\n   - Color intensity: casos_est values\n   - Use seaborn or Plotly heatmap\n2. Create box plots:\n   - Group cases by month (derived from data_iniSE)\n   - Aggregate across all years to show monthly distribution\n3. Identify and annotate:\n   - Typical high season (usually Dec-Apr for dengue in SP)\n   - Typical low season (usually Jun-Oct)\n4. Add markdown cells with epidemiological interpretation of seasonal patterns",
-            "status": "pending",
+            "details": "Add Seasonal Patterns section to the notebook:\n\n1. Create heatmap visualization:\n   - X-axis: Epidemiological weeks (1-52)\n   - Y-axis: Years\n   - Color intensity: casos_est values\n   - Use seaborn or Plotly heatmap\n2. Create box plots:\n   - Group cases by month (derived from data_iniSE)\n   - Aggregate across all years to show monthly distribution\n3. Identify and annotate:\n   - Typical high season (usually Dec-Apr for dengue in SP)\n   - Typical low season (usually Jun-Oct)\n4. Add markdown cells with epidemiological interpretation of seasonal patterns\n<info added on 2026-10-22T15:30:33.141Z>\nLet me analyze the codebase to understand the current implementation and provide a detailed update for this subtask.Now I have all the context needed to provide a comprehensive update for subtask 4.3. The user's request indicates Section 3 (Seasonal Patterns) has been completed with three visualizations: a heatmap (SE x year with log10 scale), a boxplot by month, and a normalized seasonal profile showing that EWs 10-19 concentrate approximately 44% of annual cases. The key insight was normalizing by annual total to prevent 2024 from dominating the median.\n\nSection 3 implemented with three visualizations:\n1. Heatmap: epidemiological weeks (1-52) x years, color = log10(casos_est + 1), using seaborn.heatmap with YlOrRd colormap\n2. Boxplot: cases grouped by month across all years, log scale, showing distribution with seaborn.boxplot\n3. Normalized seasonal profile bar chart: median percentage of annual cases per epidemiological week, calculated by dividing each week's casos_est by annual total before computing median — this prevents 2024 (extreme outlier) from dominating the pattern\n\nKey finding: EWs 10-19 (March to mid-May) concentrate approximately 44% of annual cases across all complete years. The normalization approach ensures the seasonal pattern reflects consistent proportional behavior rather than being skewed by the 2024 outbreak magnitude. Second semester is consistently low season. Pattern holds in both normal and outbreak years (2014, 2015, 2019, 2023, 2024, 2025), which only shift the curve upward without changing the shape.\n\nImplementation location: notebooks/analise_dengue_sp.ipynb cells 14-17 (cell IDs 3df5785c, b41823b4, ae5da55b, 984fca64).\n</info added on 2026-10-22T15:30:33.141Z>",
+            "status": "done",
             "testStrategy": "Verify heatmap displays correctly with proper axis labels, box plots show monthly distributions, and seasonal patterns are clearly visible",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T15:30:40.033Z"
           },
           {
             "id": 4,
@@ -260,15 +263,17 @@
               2,
               3
             ],
-            "details": "Add remaining sections and create approval template:\n\n**Epidemiological Indicators Section:**\n1. Plot Rt time series with p_rt1 as secondary axis\n2. Perform lag correlation analysis: Rt vs future cases (1-4 week lags)\n3. Create alert level distribution pie chart\n\n**Recent Trends Section (last 12 weeks):**\n1. Detailed view of recent indicators (table + charts)\n2. Week-over-week variation chart (% change)\n3. Nowcast uncertainty bands using casos_est_min/max\n\n**Proposed Dashboard Visualizations Section:**\n1. Summarize key findings from all analyses\n2. Propose 4-6 visualizations with rationale:\n   - Main time series with alert levels (Plotly interactive)\n   - Current situation KPI card\n   - Seasonal comparison chart\n   - Recent trend sparkline\n   - Rt gauge indicator\n   - Historical heatmap (optional)\n\n**Create docs/visualizacoes.md:**\nCreate template file with checkboxes for human approval, including all proposed visualizations and space for reviewer comments",
-            "status": "pending",
+            "details": "Add remaining sections and create approval template:\n\n**Epidemiological Indicators Section:**\n1. Plot Rt time series with p_rt1 as secondary axis\n2. Perform lag correlation analysis: Rt vs future cases (1-4 week lags)\n3. Create alert level distribution pie chart\n\n**Recent Trends Section (last 12 weeks):**\n1. Detailed view of recent indicators (table + charts)\n2. Week-over-week variation chart (% change)\n3. Nowcast uncertainty bands using casos_est_min/max\n\n**Proposed Dashboard Visualizations Section:**\n1. Summarize key findings from all analyses\n2. Propose 4-6 visualizations with rationale:\n   - Main time series with alert levels (Plotly interactive)\n   - Current situation KPI card\n   - Seasonal comparison chart\n   - Recent trend sparkline\n   - Rt gauge indicator\n   - Historical heatmap (optional)\n\n**Create docs/visualizacoes.md:**\nCreate template file with checkboxes for human approval, including all proposed visualizations and space for reviewer comments\n<info added on 2026-10-22T15:31:07.232Z>\nBased on my analysis of the notebook (`notebooks/analise_dengue_sp.ipynb`), the docs file (`docs/visualizacoes.md`), and the integration test (`tests/integration/test_notebook.py`), I can now generate the update text.\n\nImplementation complete:\n\nSections 4-6 implemented:\n- Rt/p_rt1 time series (2023+, ylim 0-3 to handle Rt peak of 4.6 at 2023 turn)\n- Spearman correlation analysis: Rt and p_rt1 vs log growth of casos_est at lags 1-8 weeks, coefficients ~0.30-0.44 with peak at 3-5 weeks. Used rank-based Spearman via pandas .rank().corr() to avoid scipy dependency\n- Alert level distribution: pie chart + stacked bar chart by year\n\nSection 5 (last 12 weeks):\n- Detailed table with variacao_% and sub_notificacao_%\n- Bar/line chart: notificados vs nowcast with uncertainty band\n- Week-over-week variation chart (% change, colored red/green)\n\nSection 6 (dashboard proposals):\n- 6 Plotly mockups with notebook_connected renderer: main time series with alert bands (6.1), KPI card via make_subplots/Indicator (6.2), seasonal comparison (6.3), sparkline (6.4), Rt gauge (6.5), historical heatmap optional (6.6)\n- KPIs use calcular_situacao_atual from data module\n\nFiles created/modified:\n- docs/visualizacoes.md: approval template with checkboxes for 6 visualizations\n- Notebook output ~920 KB: excluded from check-added-large-files pre-commit hook\n- tests/integration/test_notebook.py: integration test using nbclient, ~6 s execution, pytest.mark.integration marker\n</info added on 2026-10-22T15:31:07.232Z>",
+            "status": "done",
             "testStrategy": "Verify all cells execute without errors, Rt correlation analysis produces meaningful results, docs/visualizacoes.md template is created with correct format and all proposed visualization options",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T15:31:14.111Z"
           }
         ],
         "complexity": 4,
         "recommendedSubtasks": 4,
-        "expansionPrompt": "Break down notebook creation into: 1) Data overview section - load snapshot, display statistics, data types, sample rows; 2) Time series analysis - plot casos_est over time with alert level color bands and outbreak annotations; 3) Seasonal patterns - create heatmap (weeks x years), box plots by month, identify high/low seasons; 4) Recent trends and visualization proposals - Rt time series, correlation analysis, proposed dashboard visualizations list, and create docs/visualizacoes.md template for human approval."
+        "expansionPrompt": "Break down notebook creation into: 1) Data overview section - load snapshot, display statistics, data types, sample rows; 2) Time series analysis - plot casos_est over time with alert level color bands and outbreak annotations; 3) Seasonal patterns - create heatmap (weeks x years), box plots by month, identify high/low seasons; 4) Recent trends and visualization proposals - Rt time series, correlation analysis, proposed dashboard visualizations list, and create docs/visualizacoes.md template for human approval.",
+        "updatedAt": "2026-10-22T15:31:26.485Z"
       },
       {
         "id": "5",
@@ -713,7 +718,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-10-22T14:58:58.721Z",
+      "lastModified": "2026-10-22T15:31:26.485Z",
       "taskCount": 12,
       "completedCount": 5,
       "tags": [

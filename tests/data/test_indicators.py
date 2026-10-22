@@ -1,12 +1,14 @@
 """Testes do cálculo dos indicadores (sem rede)."""
 
 import json
+from collections.abc import Callable
 from dataclasses import asdict
 
 import pandas as pd
 import pytest
 
 from smart_hospitals.data.indicators import (
+    ParametroInvalido,
     calcular_situacao_atual,
     calcular_tendencia,
     comparativo_sazonal,
@@ -230,3 +232,29 @@ def test_indicadores_no_snapshot_versionado() -> None:
     assert situacao.data_referencia == df["data_iniSE"].iloc[-1].strftime("%Y-%m-%d")
     assert comparativo["anos_comparados"] >= 10
     json.dumps([tendencia.semanas, comparativo, serie_historica(df, 201001, 202653)])
+
+
+@pytest.mark.parametrize(
+    "call",
+    [
+        lambda df: calcular_tendencia(df, 0),
+        lambda df: serie_historica(df, "2024", "202401"),
+        lambda df: serie_historica(df, "202401", "2024-01-01"),
+        lambda df: serie_historica(df, 202405, 202401),
+        lambda df: comparativo_sazonal(df, 54),
+    ],
+)
+def test_erros_de_parametro_sao_parametro_invalido(
+    sample_dengue_data: pd.DataFrame, call: Callable[[pd.DataFrame], object]
+) -> None:
+    with pytest.raises(ParametroInvalido):
+        call(sample_dengue_data)
+
+
+def test_erros_nos_dados_nao_sao_parametro_invalido(sample_dengue_data: pd.DataFrame) -> None:
+    with pytest.raises(ValueError) as nivel:
+        calcular_situacao_atual(sample_dengue_data.assign(nivel=5))
+    with pytest.raises(ValueError) as vazio:
+        calcular_situacao_atual(sample_dengue_data.head(0))
+    assert not isinstance(nivel.value, ParametroInvalido)
+    assert not isinstance(vazio.value, ParametroInvalido)

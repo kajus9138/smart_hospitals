@@ -66,3 +66,21 @@ uv run python scripts/extract_infodengue.py   # opções: --output CAMINHO, --ey
 
 O script registra em stderr quantas semanas baixou, o intervalo de SEs e o tamanho do arquivo.
 Revise o diff do CSV e faça o commit.
+
+### Módulo de dados
+
+`smart_hospitals.data` lê o snapshot e calcula os indicadores usados pelo dashboard e pelo MCP:
+
+```python
+from smart_hospitals.data import (
+    calcular_situacao_atual, calcular_tendencia, comparativo_sazonal, load_snapshot, serie_historica,
+)
+
+df = load_snapshot()                              # valida colunas e ordena por SE
+calcular_situacao_atual(df)                       # última SE: nowcast, nível, Rt, variação semanal
+calcular_tendencia(df, semanas=4)                 # alta / estavel / queda pelas médias de Rt e p_rt1
+serie_historica(df, "2024-01-01", "2024-12-31")   # ou por SE: serie_historica(df, 202401, 202452)
+comparativo_sazonal(df)                           # mesma SE nos anos anteriores
+```
+
+Séries e comparativos saem prontos para JSON (datas ISO, valores ausentes como `None`).

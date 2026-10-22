@@ -8,9 +8,10 @@ repos:
       - id: end-of-file-fixer
         exclude: ^\.taskmaster/
       - id: check-yaml
-      # uv.lock precisa ser versionado mesmo passando de 500 KB
+      # uv.lock e o notebook de análise (versionado com saídas, para revisão
+      # no GitHub) precisam ser versionados mesmo passando de 500 KB
       - id: check-added-large-files
-        exclude: ^uv\.lock$
+        exclude: ^(uv\.lock|notebooks/analise_dengue_sp\.ipynb)$
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.1
     hooks:

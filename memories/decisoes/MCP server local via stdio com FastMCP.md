@@ -13,7 +13,8 @@ tags:
 Origem: PRD seções 4, 5, 6 (RF02), 7 e 8.
 
 ## Decisão
-MCP server com o SDK oficial `mcp` para Python (FastMCP), transporte stdio, execução local, somente leitura.
+MCP server com o SDK oficial `mcp` para Python **v2** (`mcp[cli]>=2.3,<3`), usando a classe `MCPServer`
+(`from mcp.server import MCPServer`; na v1 ela se chamava `FastMCP`), transporte stdio, execução local, somente leitura.
 Quatro tools, todas retornando a data de referência do snapshot:
 - `situacao_atual()`: casos notificados, casos_est (mín./máx.), incidência/100 mil hab., nível de alerta, Rt, p_rt1, variação semanal.
 - `tendencia(semanas=4)`: indicadores das últimas N semanas + resumo (alta, estável ou queda) derivado de Rt, p_rt1 e variação semanal.
@@ -30,6 +31,8 @@ Os consumidores nesta fase são clientes MCP locais (Claude Desktop/Claude Code)
 - Publicar o MCP na internet com transporte HTTP: fora de escopo nesta fase (exigiria hospedagem,
   autenticação e exposição pública).
 - Tools de escrita/atualização de dados: o MCP é somente leitura (RNF01).
+- Fixar o SDK `mcp` v1 (`from mcp.server.fastmcp import FastMCP`), como dizia o PRD: descartado na tarefa 1
+  (2026-10-22); a v2 é a linha atual e renomeou FastMCP para `MCPServer` mantendo a API de decorators.
 
 ## Observations
 - [decision] Transporte stdio, execução local; HTTP fica para fase futura #mcp

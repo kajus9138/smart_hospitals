@@ -18,7 +18,7 @@ Origem: PRD seções 8 e 11.
 - Análise exploratória: Jupyter notebook (dependência de desenvolvimento) com pandas, numpy, seaborn, matplotlib.
 - Dashboard: Streamlit + Plotly (gráficos interativos), publicado direto do repositório no Streamlit Community
   Cloud (plano gratuito); sem etapa de build.
-- MCP: SDK oficial `mcp` (FastMCP).
+- MCP: SDK oficial `mcp` v2 (`MCPServer`, antigo FastMCP).
 
 ## Contexto
 Stack de uma linguagem só para extração, análise, dashboard e MCP, compartilhando o módulo de dados.

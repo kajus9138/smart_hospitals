@@ -2,10 +2,21 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
+      # .taskmaster/ é gerado pelo task-master; não reformatar
       - id: trailing-whitespace
+        exclude: ^\.taskmaster/
       - id: end-of-file-fixer
+        exclude: ^\.taskmaster/
       - id: check-yaml
+      # uv.lock precisa ser versionado mesmo passando de 500 KB
       - id: check-added-large-files
+        exclude: ^uv\.lock$
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.1
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
   - repo: local
     hooks:
       - id: block-main
@@ -14,10 +25,16 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-      # Descomente quando o projeto tiver testes:
-      # - id: run-tests
-      #   name: Run tests
-      #   entry: <comando-de-teste-do-projeto>
-      #   language: system
-      #   pass_filenames: false
-      #   always_run: true
+      # mypy roda no ambiente do projeto (uv) para enxergar as dependências e os stubs
+      - id: mypy
+        name: mypy
+        entry: uv run mypy
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: run-tests
+        name: Run tests
+        entry: uv run pytest -q
+        language: system
+        pass_filenames: false
+        always_run: true

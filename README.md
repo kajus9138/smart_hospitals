@@ -40,3 +40,16 @@ uv tool install basic-memory
 uv tool install pre-commit
 claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp
 ```
+
+## Desenvolvimento (smart_hospitals)
+
+Python 3.12 gerenciado com `uv`. Código em `src/smart_hospitals/` (`data/` é o módulo compartilhado
+entre `dashboard/` e `mcp_server/`); testes em `tests/`.
+
+```bash
+uv sync                                   # cria o .venv com dependências de produção e dev
+uv run pytest --cov                       # testes (cobertura mínima de 80%)
+uv run ruff check . && uv run mypy .      # lint e tipos
+uv run ruff format .                      # formatação
+pre-commit install                        # hooks: ruff, mypy, testes e bloqueio da main
+```

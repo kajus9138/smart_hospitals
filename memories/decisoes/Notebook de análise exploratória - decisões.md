@@ -22,6 +22,11 @@ Origem: task 4, `notebooks/analise_dengue_sp.ipynb` e `docs/visualizacoes.md`, e
   anos; em escala linear o surto apaga o resto. O mockup da série principal abre nos últimos 3 anos.
 - **Comparação sazonal com mediana** no mockup (média por SE é puxada pelos surtos). O
   `comparativo_sazonal` do módulo usa média: o dashboard deve usar a mesma estatística no gráfico e no card.
+- **Banda do nowcast só nas semanas com intervalo** (`casos_est_max > casos_est_min`), desenhada como
+  um polígono (`fill="toself"`) por trecho contínuo. No snapshot, só as 10 últimas SEs (202631 a 202640)
+  têm intervalo; nas consolidadas min = max = `casos_est` ou o max vem vazio (2015, 2024, 2025). A
+  primeira versão usava `fill="tonexty"` sobre a série inteira, e as lacunas do max deixavam a banda
+  estranha em 2024/2025. O dashboard (task 6) deve seguir a mesma regra.
 - **Spearman calculado como Pearson sobre postos**: `Series.corr(method="spearman")` exige scipy, que
   não é dependência. Crescimento calculado na série completa e só depois filtrado (Rt = 0 nas 5 primeiras SEs de 2010).
 - **Teste de integração** (`tests/integration/test_notebook.py`, marker `integration`) executa o notebook
@@ -48,6 +53,8 @@ Origem: task 4, `notebooks/analise_dengue_sp.ipynb` e `docs/visualizacoes.md`, e
 - [decision] Notebook de análise versionado com saídas, fora do limite de 500 KB do pre-commit #notebook
 - [decision] Escala log em séries de casos por causa do surto de 2024 #visualizacao
 - [decision] Comparação sazonal deve usar a mesma estatística no gráfico e no card #visualizacao
+- [fact] Intervalo do nowcast só existe nas semanas recentes; consolidadas têm min = max ou max vazio #infodengue
+- [convention] Banda de incerteza só onde max > min, um polígono por trecho contínuo #visualizacao
 - [fact] SEs 10-19 concentram ~44% dos casos anuais em SP #sazonalidade
 - [fact] Rt/p_rt1 antecipam o crescimento em 3-5 semanas (Spearman ~0,4) #indicadores
 

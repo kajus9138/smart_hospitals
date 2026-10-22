@@ -446,7 +446,7 @@
         "id": "9",
         "title": "Implement MCP Server with FastMCP",
         "description": "Create the MCP server using FastMCP SDK with stdio transport, implementing the four required tools (situacao_atual, tendencia, serie_historica, comparativo_sazonal) with proper parameter validation and logging. Unit tests are included as part of this task (tests alongside code, per dev-workflow.md).",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "3"
         ],
@@ -459,10 +459,11 @@
             "title": "Create MCP server skeleton with FastMCP, stdio transport, and data loading",
             "description": "Set up the foundational MCP server structure including FastMCP Server initialization, stdio transport configuration, logging to stderr only (critical for MCP protocol), and data loading at startup using the shared data module.",
             "dependencies": [],
-            "details": "Create `src/smart_hospitals/mcp_server/` directory structure with `__init__.py`, `server.py`, and `__main__.py`. In `server.py`: import FastMCP Server and stdio_server from mcp.server.stdio, configure logging to ONLY use sys.stderr (stdout is reserved for MCP protocol - this is critical for RNF02), call load_snapshot() and get_reference_date() at module level to cache data. Create the Server instance with name 'dengue-sp-mcp'. Implement the async main() function that wraps stdio_server context manager and runs the server. Create `__main__.py` to allow `python -m smart_hospitals.mcp_server`. Add entry point to pyproject.toml: `mcp-server = \"smart_hospitals.mcp_server.server:main\"`.",
-            "status": "pending",
+            "details": "Create `src/smart_hospitals/mcp_server/` directory structure with `__init__.py`, `server.py`, and `__main__.py`. In `server.py`: import FastMCP Server and stdio_server from mcp.server.stdio, configure logging to ONLY use sys.stderr (stdout is reserved for MCP protocol - this is critical for RNF02), call load_snapshot() and get_reference_date() at module level to cache data. Create the Server instance with name 'dengue-sp-mcp'. Implement the async main() function that wraps stdio_server context manager and runs the server. Create `__main__.py` to allow `python -m smart_hospitals.mcp_server`. Add entry point to pyproject.toml: `mcp-server = \"smart_hospitals.mcp_server.server:main\"`.\n<info added on 2026-10-22T14:41:44.555Z>\nImplementation notes:\n\nMCP server implemented in src/smart_hospitals/mcp_server/server.py using mcp.server.mcpserver.MCPServer (SDK mcp v2.3) instead of the original task specification which assumed mcp.server.Server with @app.tool() decorator, which does not exist in the low-level SDK. Server name: \"dengue-sp\" with instructions text describing available indicators.\n\nData loading: Snapshot is loaded on-demand via functools.cache in get_data(). This avoids disk I/O at import time, making tests simpler to mock via monkeypatch on the get_data function (tests/mcp_server/test_server.py:40).\n\nEntry points: (1) dengue-mcp via project.scripts in pyproject.toml:18, (2) python -m smart_hospitals.mcp_server via __main__.py that calls server.main().\n\nParameter validation: Uses Annotated with pydantic.Field constraints (ge/le) for numeric parameters. Weeks in tendencia() accept 1-52 (line 99), comparativo_sazonal accepts 1-53 (line 129) since the data module supports week 53.\n\nError handling: ValueError from data module is converted to ToolError (line 73) so the error message reaches the client; other exceptions are logged with traceback but not exposed (RNF02 security).\n\nLogging (RNF02): @logged decorator (lines 44-81) emits to stderr: tool name, params dict, duration in ms, and status (ok or error message). Schema validation errors are logged by the SDK itself before reaching the tool function.\n\nTests: 30 tests in tests/mcp_server/test_server.py covering all four tools, parameter validation boundaries, logging, error handling, stdout isolation, and real data performance. Client fixture uses Client(server.mcp) for in-memory testing (line 41). Smoke test via stdio subprocess validates end-to-end with python -m smart_hospitals.mcp_server (lines 208-217). Coverage: server.py 100%, total 99%.\n</info added on 2026-10-22T14:41:44.555Z>",
+            "status": "done",
             "testStrategy": "Verify server module imports without errors. Check logging configuration sends output to stderr only. Test that no print statements exist in server code. Validate entry point registration in pyproject.toml.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T14:44:17.937Z"
           },
           {
             "id": 2,
@@ -472,9 +473,10 @@
               1
             ],
             "details": "Implement situacao_atual() as an async function decorated with @app.tool(). The function takes no parameters. It must call calcular_situacao_atual(df) from the indicators module and return a dict containing 'data_referencia' (converted to string from DATA_REF) plus all fields from the result object (__dict__). Include proper docstring describing returned fields for MCP tool schema generation. Wrap in try/except for error handling, calling log_tool_call() with timing in both success and error cases.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test with mocked DataFrame that situacao_atual returns all required fields: data_referencia, casos_est, rt, p_rt1, nivel. Verify timing and logging calls are made.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T14:44:17.941Z"
           },
           {
             "id": 3,
@@ -484,9 +486,10 @@
               1
             ],
             "details": "Implement tendencia(semanas: int = 4) as an async function with @app.tool() decorator. Validate semanas parameter is in range 1-52 before calling calcular_tendencia(df, semanas), raising ValueError with Portuguese message 'semanas deve estar entre 1 e 52' if invalid. Return dict with data_referencia plus trend result fields. Include descriptive docstring with Args section explaining the semanas parameter and its constraints for MCP schema. Use TendenciaParams Pydantic model for additional validation if needed.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test valid responses with semanas in range (1, 4, 52). Test ValueError is raised for semanas=0, semanas=-1, semanas=53, semanas=100. Verify error message matches expected Portuguese text.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T14:44:17.944Z"
           },
           {
             "id": 4,
@@ -496,9 +499,10 @@
               1
             ],
             "details": "Implement serie_historica(inicio: str, fim: str) - validate that both parameters are 6-digit strings in YYYYWW format (isdigit() and len==6), raise ValueError with message 'inicio e fim devem estar no formato YYYYWW (ex: 202001)' if invalid. Return dict with data_referencia, serie (list from serie_historica function), and total_semanas (length of serie). Implement comparativo_sazonal(semana: Optional[int] = None) - if semana is provided, validate it's in range 1-52, raising ValueError 'semana deve estar entre 1 e 52' if invalid. Call comparativo_sazonal(df, semana) and return dict with data_referencia plus result fields. Both tools need descriptive docstrings with Args sections for MCP schema.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test serie_historica with valid YYYYWW format returns expected structure. Test ValueError for invalid formats: '2024-01', '20240', '202401X'. Test comparativo_sazonal with semana=None uses default, semana=4 returns data. Test ValueError for semana=0, semana=53.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T14:44:17.946Z"
           },
           {
             "id": 5,
@@ -510,9 +514,10 @@
               4
             ],
             "details": "Implement log_tool_call(tool_name: str, params: dict, duration: float, success: bool, error: str = None) helper that logs formatted message to stderr via the module logger. Format: 'Tool: {tool_name} | Params: {params} | Duration: {duration:.3f}s | SUCCESS' or 'Tool: {tool_name} | Params: {params} | Duration: {duration:.3f}s | ERROR: {error}'. Each tool function should record start = time.time() at beginning, call log_tool_call in both try and except blocks with calculated duration. Verify all log handlers write to sys.stderr only.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Capture stderr and verify log messages contain expected format for each tool. Test successful calls log SUCCESS. Test failed calls log ERROR with exception message. Verify no output goes to stdout during any tool execution.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T14:44:17.949Z"
           },
           {
             "id": 6,
@@ -522,14 +527,16 @@
               5
             ],
             "details": "Create tests/mcp_server/__init__.py and tests/mcp_server/test_server.py. Include sample_df fixture with realistic dengue data (SE, casos, casos_est, casos_est_min, casos_est_max, Rt, p_rt1, nivel, incidencia columns). Write @pytest.mark.asyncio tests for: test_situacao_atual_returns_expected_fields, test_tendencia_valid_response, test_serie_historica_valid_response, test_comparativo_sazonal_valid_response. Write validation error tests: test_tendencia_invalid_semanas_too_high/zero, test_serie_historica_invalid_format, test_comparativo_sazonal_invalid_semana. Write stderr tests: test_logging_goes_to_stderr_not_stdout (verify handler.stream == sys.stderr), test_no_print_statements_in_server (inspect source). Use unittest.mock.patch to mock the df and indicator functions. Target >=80% coverage on src/smart_hospitals/mcp_server.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run `uv run pytest tests/mcp_server/ --cov=src/smart_hospitals/mcp_server --cov-report=term-missing` and verify >=80% coverage. All tests must pass. Verify stderr-only logging with captured output.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T14:44:17.951Z"
           }
         ],
         "complexity": 7,
         "recommendedSubtasks": 6,
-        "expansionPrompt": "Break down MCP server implementation into: 1) Create server.py skeleton with FastMCP Server, stdio transport setup, logging to stderr only, and data loading at startup; 2) Implement situacao_atual() tool with data_referencia in response; 3) Implement tendencia(semanas) tool with parameter validation (1-52 range) and trend logic; 4) Implement serie_historica(inicio, fim) and comparativo_sazonal(semana) tools with SE format validation; 5) Add logging for each tool call (name, params, duration, success/error per RNF02); 6) Create comprehensive unit tests in tests/mcp_server/ testing valid responses, parameter validation errors, and stderr-only logging, targeting >=80% coverage."
+        "expansionPrompt": "Break down MCP server implementation into: 1) Create server.py skeleton with FastMCP Server, stdio transport setup, logging to stderr only, and data loading at startup; 2) Implement situacao_atual() tool with data_referencia in response; 3) Implement tendencia(semanas) tool with parameter validation (1-52 range) and trend logic; 4) Implement serie_historica(inicio, fim) and comparativo_sazonal(semana) tools with SE format validation; 5) Add logging for each tool call (name, params, duration, success/error per RNF02); 6) Create comprehensive unit tests in tests/mcp_server/ testing valid responses, parameter validation errors, and stderr-only logging, targeting >=80% coverage.",
+        "updatedAt": "2026-10-22T14:44:17.951Z"
       },
       {
         "id": "10",
@@ -705,9 +712,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-10-22T14:19:51.298Z",
+      "lastModified": "2026-10-22T14:44:17.951Z",
       "taskCount": 12,
-      "completedCount": 3,
+      "completedCount": 4,
       "tags": [
         "master"
       ]

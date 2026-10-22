@@ -84,3 +84,24 @@ comparativo_sazonal(df)                           # mesma SE nos anos anteriores
 ```
 
 Séries e comparativos saem prontos para JSON (datas ISO, valores ausentes como `None`).
+
+### MCP server
+
+Servidor MCP local (SDK `mcp` v2, transporte stdio, somente leitura) que expõe os indicadores para
+agentes de IA. Toda resposta traz `data_referencia`, a semana mais recente do snapshot.
+
+| Tool | Parâmetros | Retorno |
+|---|---|---|
+| `situacao_atual` | - | casos notificados, `casos_est` (mín./máx.), incidência/100 mil, nível, Rt, p_rt1, variação semanal |
+| `tendencia` | `semanas` (1-52, padrão 4) | indicadores das últimas N semanas + `alta` / `estavel` / `queda` |
+| `serie_historica` | `inicio`, `fim` (SE `202401` ou data `2024-01-01`) | série semanal no intervalo |
+| `comparativo_sazonal` | `semana` (1-53, padrão: a mais recente) | mesma SE nos anos anteriores (média, mín., máx.) |
+
+```bash
+uv run dengue-mcp                                          # ou: uv run python -m smart_hospitals.mcp_server
+claude mcp add dengue-sp -- uv run --directory "$PWD" dengue-mcp   # registrar no Claude Code
+```
+
+Para inspecionar as tools no navegador: `uv run mcp dev src/smart_hospitals/mcp_server/server.py`.
+Cada chamada é registrada em stderr (tool, parâmetros, duração e status); o stdout é do protocolo.
+O snapshot é carregado uma vez, na inicialização: depois de atualizar o CSV, reinicie o servidor.

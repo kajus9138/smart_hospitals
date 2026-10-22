@@ -9,7 +9,7 @@
         "testStrategy": "Verify project setup by running:\n- `uv sync` completes without errors\n- `uv run python -c \"import pandas; import streamlit; import plotly; import mcp\"` succeeds\n- `uv run ruff check .` runs without configuration errors\n- `uv run mypy .` runs without configuration errors\n- `uv run pytest --collect-only` discovers test directory",
         "priority": "high",
         "dependencies": [],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -61,7 +61,7 @@
         "complexity": 4,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Break down Python project initialization into: 1) Create pyproject.toml with production/dev dependencies and tool configurations (ruff, mypy, pytest); 2) Create src/smart_hospitals/ package structure with __init__.py files for data/, dashboard/, mcp_server/ modules; 3) Create supporting directories (data/, notebooks/, tests/, docs/) with .gitkeep files; 4) Update .gitignore with Python patterns and .pre-commit-config.yaml placeholders for future hooks. Verify each step with appropriate commands (uv sync, import checks).",
-        "updatedAt": "2026-10-22T12:40:18.975Z"
+        "updatedAt": "2026-10-22T13:17:48.091Z"
       },
       {
         "id": 2,
@@ -73,7 +73,7 @@
         "dependencies": [
           "1"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -81,9 +81,10 @@
             "description": "Implement the core extraction script that constructs the InfoDengue API URL with proper parameters and fetches dengue data for São Paulo using pandas.read_csv(url).",
             "dependencies": [],
             "details": "Create `scripts/extract_infodengue.py` with:\n\n1. **URL construction function:**\n   - Base URL: `https://info.dengue.mat.br/api/alertcity`\n   - Parameters: geocode=3550308, disease=dengue, format=csv, ew_start=1, ew_end=52, ey_start=2010, ey_end=<current_year>\n   - Use f-string or urllib.parse for clean URL building\n\n2. **Data fetching function `fetch_infodengue_data()`:**\n   - Accept optional geocode and disease parameters with São Paulo defaults\n   - Use `pandas.read_csv(url)` to fetch CSV directly from API\n   - Preserve all required fields: data_iniSE, SE, casos_est, casos_est_min, casos_est_max, casos, p_rt1, p_inc100k, Rt, nivel, receptession_t\n\n3. **Main function with CSV output:**\n   - Create `data/` directory if not exists using `Path.mkdir(parents=True, exist_ok=True)`\n   - Save to `data/dengue_sp_snapshot.csv` with UTF-8 encoding and `index=False`\n   - Add basic error handling for network/API failures with informative error messages",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify URL construction produces correct query string. Test with mocked HTTP response that pandas.read_csv() parses correctly. Validate output CSV has all required columns preserved.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T13:43:56.111Z"
           },
           {
             "id": 2,
@@ -93,9 +94,10 @@
               1
             ],
             "details": "Enhance the script with logging:\n\n1. **Configure logging:**\n   - `logging.basicConfig(level=logging.INFO, stream=sys.stderr, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')`\n   - Create logger: `logger = logging.getLogger(__name__)`\n\n2. **Log messages during execution:**\n   - Before fetch: log the constructed URL\n   - After fetch: log number of weeks downloaded (`len(df)` rows)\n   - After fetch: log date range covered (first and last SE values: `df['SE'].min()` to `df['SE'].max()`)\n   - After save: log file size in KB (`path.stat().st_size / 1024`) and full path\n\n3. **Error logging:**\n   - Log errors at ERROR level if API request fails\n   - Log warnings if data appears incomplete (e.g., missing expected columns)\n\nExample output format:\n```\n2024-01-15 10:30:00 - extract_infodengue - INFO - Fetching data from https://info.dengue.mat.br/api/alertcity?...\n2024-01-15 10:30:05 - extract_infodengue - INFO - Downloaded 728 weeks from SE 201001 to SE 202352\n2024-01-15 10:30:05 - extract_infodengue - INFO - Saved 125.3 KB to data/dengue_sp_snapshot.csv\n```",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Capture stderr output during script execution and verify log messages contain expected information (week count, SE range, file size). Use pytest's caplog fixture to assert log levels and message content.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T13:43:58.013Z"
           },
           {
             "id": 3,
@@ -105,15 +107,17 @@
               1,
               2
             ],
-            "details": "Create `tests/scripts/test_extract_infodengue.py` with:\n\n1. **Test fixtures:**\n   - Create sample CSV data fixture mimicking InfoDengue API response format\n   - Include all required columns with realistic test values\n   - Fixture should have 3-5 rows representing different epidemiological weeks\n\n2. **Unit tests using pytest-mock or responses library:**\n   - `test_url_construction()`: verify URL has correct parameters (geocode, disease, format, date range)\n   - `test_fetch_data_success()`: mock pandas.read_csv, verify DataFrame returned with correct structure\n   - `test_csv_parsing_preserves_columns()`: verify all required columns are present in output\n   - `test_logging_output()`: capture stderr, verify log messages format and content\n   - `test_output_file_created()`: use tmp_path fixture, verify CSV file is created with correct encoding\n\n3. **Execute initial extraction:**\n   - Run `uv run python scripts/extract_infodengue.py` to generate `data/dengue_sp_snapshot.csv`\n   - Verify file exists and contains expected data structure\n   - This snapshot will be used by Task 3 (data module) and Task 4 (analysis notebook)",
-            "status": "pending",
+            "details": "Create `tests/scripts/test_extract_infodengue.py` with:\n\n1. **Test fixtures:**\n   - Create sample CSV data fixture mimicking InfoDengue API response format\n   - Include all required columns with realistic test values\n   - Fixture should have 3-5 rows representing different epidemiological weeks\n\n2. **Unit tests using pytest-mock or responses library:**\n   - `test_url_construction()`: verify URL has correct parameters (geocode, disease, format, date range)\n   - `test_fetch_data_success()`: mock pandas.read_csv, verify DataFrame returned with correct structure\n   - `test_csv_parsing_preserves_columns()`: verify all required columns are present in output\n   - `test_logging_output()`: capture stderr, verify log messages format and content\n   - `test_output_file_created()`: use tmp_path fixture, verify CSV file is created with correct encoding\n\n3. **Execute initial extraction:**\n   - Run `uv run python scripts/extract_infodengue.py` to generate `data/dengue_sp_snapshot.csv`\n   - Verify file exists and contains expected data structure\n   - This snapshot will be used by Task 3 (data module) and Task 4 (analysis notebook)\n<info added on 2026-10-22T13:44:25.634Z>\nImplementation completed for scripts/extract_infodengue.py with four functions: build_url (constructs API URL), fetch_infodengue_data (downloads, validates and sorts data), save_snapshot (saves CSV with UTF-8), and main (argparse CLI). API findings: 'receptession_t' column does not exist, using 'receptivo' instead; ew_end=53 required to capture years with 53 epidemiological weeks (2014, 2020, 2025) since ew_end=52 missed SEs 201453, 202053, 202553; API returns data in descending order so sorting by SE column is necessary. Snapshot preserves all 30 columns returned by API: 875 weeks (SE 201001 to SE 202640), 204 KB file size. Tests in tests/scripts/test_extract_infodengue.py use offline approach with real data sample in tests/scripts/fixtures/infodengue_sample.csv (5 rows including edge cases for week 53). pytest configured with pythonpath=[\"scripts\"] and ruff with src=[\"src\", \"scripts\"] in pyproject.toml to enable clean imports.\n</info added on 2026-10-22T13:44:25.634Z>",
+            "status": "done",
             "testStrategy": "Run `uv run pytest tests/scripts/test_extract_infodengue.py -v --cov=scripts --cov-report=term-missing`. All tests must pass with mocked HTTP responses. Integration validation: manually run the script and verify data/dengue_sp_snapshot.csv is created with valid CSV content.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-22T13:43:59.899Z"
           }
         ],
         "complexity": 3,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down extraction script creation into: 1) Create scripts/extract_infodengue.py with URL construction and pandas CSV fetching from InfoDengue API; 2) Implement logging to stderr (week count, date range, file size); 3) Write unit tests in tests/scripts/test_extract_infodengue.py with mocked HTTP responses using pytest fixtures. Execute the script once to generate the initial data/dengue_sp_snapshot.csv for subsequent tasks."
+        "expansionPrompt": "Break down extraction script creation into: 1) Create scripts/extract_infodengue.py with URL construction and pandas CSV fetching from InfoDengue API; 2) Implement logging to stderr (week count, date range, file size); 3) Write unit tests in tests/scripts/test_extract_infodengue.py with mocked HTTP responses using pytest fixtures. Execute the script once to generate the initial data/dengue_sp_snapshot.csv for subsequent tasks.",
+        "updatedAt": "2026-10-22T13:43:59.899Z"
       },
       {
         "id": 3,
@@ -695,13 +699,13 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-10-22T12:40:18.975Z",
+      "lastModified": "2026-10-22T13:43:59.900Z",
       "taskCount": 12,
-      "completedCount": 0,
+      "completedCount": 2,
       "tags": [
         "master"
       ],
-      "created": "2026-10-22T12:42:15.636Z",
+      "created": "2026-10-22T13:44:01.818Z",
       "description": "Tasks for master context"
     }
   }

@@ -53,3 +53,16 @@ uv run ruff check . && uv run mypy .      # lint e tipos
 uv run ruff format .                      # formatação
 pre-commit install                        # hooks: ruff, mypy, testes e bloqueio da main
 ```
+
+### Atualizar o snapshot de dados
+
+Dashboard, MCP server e testes leem apenas `data/dengue_sp_snapshot.csv` (série semanal de dengue
+de São Paulo capital desde a SE 1/2010, todas as colunas da API `alertcity` do InfoDengue). Para
+atualizá-lo, sob demanda:
+
+```bash
+uv run python scripts/extract_infodengue.py   # opções: --output CAMINHO, --ey-end ANO
+```
+
+O script registra em stderr quantas semanas baixou, o intervalo de SEs e o tamanho do arquivo.
+Revise o diff do CSV e faça o commit.

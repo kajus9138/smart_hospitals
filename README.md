@@ -49,7 +49,7 @@ entre `dashboard/` e `mcp_server/`); testes em `tests/`.
 ```bash
 uv sync                                   # cria o .venv com dependências de produção e dev
 uv run pytest --cov                       # testes (cobertura mínima de 80%)
-uv run pytest -m "not integration"        # pula os testes que sobem o MCP via stdio
+uv run pytest -m "not integration"        # pula MCP via stdio e execução do notebook
 uv run ruff check . && uv run mypy .      # lint e tipos
 uv run ruff format .                      # formatação
 pre-commit install                        # hooks: ruff, mypy, testes e bloqueio da main
@@ -85,6 +85,20 @@ comparativo_sazonal(df)                           # mesma SE nos anos anteriores
 ```
 
 Séries e comparativos saem prontos para JSON (datas ISO, valores ausentes como `None`).
+
+### Análise exploratória
+
+`notebooks/analise_dengue_sp.ipynb` analisa o snapshot (série, sazonalidade, Rt, alertas, últimas 12
+semanas) e propõe as visualizações do dashboard. Fica versionado com as saídas, para revisão no
+GitHub; os mockups Plotly da seção 6 só aparecem no Jupyter. A escolha do responsável vai em
+`docs/visualizacoes.md`, que libera a implementação do dashboard.
+
+```bash
+uv run jupyter lab notebooks/analise_dengue_sp.ipynb                         # explorar
+uv run jupyter nbconvert --to notebook --execute --inplace notebooks/analise_dengue_sp.ipynb
+```
+
+Depois de atualizar o snapshot, reexecute com o segundo comando e revise os números citados no texto.
 
 ### MCP server
 

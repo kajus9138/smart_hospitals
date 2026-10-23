@@ -18,7 +18,8 @@ aparecem abrindo o notebook no Jupyter).
   anteriores, por SE (notebook 6.3)
 - [ ] Mini-gráfico de tendência recente — sparkline das últimas 12 semanas com o rótulo
   alta / estável / queda (notebook 6.4)
-- [ ] Indicador Rt — medidor com faixas de queda / estável / alta e P(Rt > 1) (notebook 6.5)
+- [ ] Indicador Rt — medidor com faixas de queda / estável / alta e a probabilidade de
+  transmissão em crescimento (p_rt1) (notebook 6.5)
 - [ ] Mapa de calor histórico — SE × ano em escala log, opcional (notebook 6.6)
 
 ### Observações:

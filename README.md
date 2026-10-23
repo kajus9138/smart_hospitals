@@ -1,59 +1,43 @@
-# Template de workflow com Claude Code
+# Smart Hospitals - Dashboard Epidemiológico Dengue SP
 
-Ponto de partida para novos projetos: PRD → backlog no Task Master → uma branch por tarefa →
-plano aprovado → implementação → revisão → PR → decisões registradas no Basic Memory.
+Dashboard e MCP server para o monitoramento epidemiológico da dengue no município de São Paulo, com
+dados públicos do [InfoDengue](https://info.dengue.mat.br/). O dashboard serve às pessoas; o MCP
+server expõe os mesmos indicadores a agentes de IA (Claude Desktop, Claude Code ou outro cliente MCP).
 
-O guia completo, com o porquê de cada peça, está em `docs/guia-dev-workflow-claude-code.pdf`.
+Dashboard publicado: [Dengue SP - Smart Hospitals](https://smarthospitals-ves4qyrifjnibfba9uxikl.streamlit.app/)
 
-## Criar um projeto novo
+## Requisitos
+
+- Python 3.12
+- [uv](https://github.com/astral-sh/uv) (gerenciador de pacotes; instala o Python 3.12 se faltar)
+- `pre-commit` (`uv tool install pre-commit`), só para quem vai fazer commits
+
+## Instalação
 
 ```bash
-scripts/new-project.sh ~/projetos/meu-app            # nome do projeto = nome da pasta
-scripts/new-project.sh ~/projetos/meu-app meu_app    # ou um nome explícito
+git clone https://github.com/kajus9138/smart_hospitals.git
+cd smart_hospitals
+uv sync             # cria o .venv com dependências de produção e dev
+pre-commit install  # hooks: ruff, mypy, testes e bloqueio da main
 ```
 
-O script copia o template (sem histórico, segredos, memórias nem tarefas), registra o projeto
-no Basic Memory, cria o `.env`, roda `git init -b main`, instala o pre-commit e faz o commit
-inicial. Se você clonou o template por outro caminho (ex.: `gh repo create --template`),
-rode só `scripts/setup.sh` na raiz do projeto novo.
+## Desenvolvimento
 
-## O que vem no template
-
-| Arquivo | Papel |
-|---|---|
-| `CLAUDE.md` | Regras que o Claude Code carrega em toda sessão; importa o `dev-workflow.md` |
-| `dev-workflow.md` | O passo a passo por tarefa. Preencha as convenções e os comandos do projeto |
-| `.mcp.json` | MCPs do projeto: Task Master e Basic Memory |
-| `.claude/settings.json` | Permissões: bloqueia `--no-verify`, push forçado e leitura do `.env` |
-| `.pre-commit-config.yaml` | Gates do commit: ruff (lint e format), mypy, pytest (cobertura ≥ 80%), bloqueio da `main` e arquivos ≤ 500 KB |
-| `.taskmaster/` | Config do Task Master (claude-code + Perplexity) e template de PRD |
-| `memories/` | Base do Basic Memory, versionada no Git |
-| `scripts/` | `new-project.sh` e `setup.sh` |
-
-## Pré-requisitos (uma vez por máquina)
-
-Node 18+, `uv`, `git`, `gh` autenticado, Claude Code, e:
+Código em `src/smart_hospitals/` (`data/` é o módulo compartilhado entre `dashboard/` e
+`mcp_server/`); testes em `tests/`.
 
 ```bash
-npm install -g task-master-ai
-uv tool install basic-memory
-uv tool install pre-commit
-claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp
-```
-
-## Desenvolvimento (smart_hospitals)
-
-Python 3.12 gerenciado com `uv`. Código em `src/smart_hospitals/` (`data/` é o módulo compartilhado
-entre `dashboard/` e `mcp_server/`); testes em `tests/`.
-
-```bash
-uv sync                                   # cria o .venv com dependências de produção e dev
-uv run pytest --cov                       # testes (cobertura mínima de 80%)
+uv run pytest --cov                       # todos os testes, com cobertura (mínimo de 80%)
+uv run pytest tests/data/                 # só o módulo de dados
+uv run pytest -v                          # saída detalhada
 uv run pytest -m "not integration"        # pula MCP via stdio e execução do notebook
 uv run ruff check . && uv run mypy .      # lint e tipos
 uv run ruff format .                      # formatação
-pre-commit install                        # hooks: ruff, mypy, testes e bloqueio da main
 ```
+
+O fluxo de trabalho por tarefa (Task Master, branches, revisão, Basic Memory) está em
+`dev-workflow.md`; a origem desse fluxo, o template de projeto, em
+[`docs/template-workflow.md`](docs/template-workflow.md).
 
 ### Atualizar o snapshot de dados
 
@@ -65,8 +49,8 @@ atualizá-lo, sob demanda:
 uv run python scripts/extract_infodengue.py   # opções: --output CAMINHO, --ey-end ANO
 ```
 
-O script registra em stderr quantas semanas baixou, o intervalo de SEs e o tamanho do arquivo.
-Revise o diff do CSV e faça o commit.
+O script registra em stderr quantas semanas baixou, o intervalo de SEs e o tamanho do arquivo, e
+sobrescreve o CSV. Revise o diff do CSV e faça o commit.
 
 ### Módulo de dados
 
@@ -104,20 +88,20 @@ uv run jupyter nbconvert --to notebook --execute --inplace notebooks/analise_den
 
 Depois de atualizar o snapshot, reexecute com o segundo comando e revise os números citados no texto.
 
-### Dashboard
+## Dashboard
 
 `src/smart_hospitals/dashboard/` mostra só as visualizações aprovadas em `docs/visualizacoes.md`,
 com a data de referência (e a SE) no cabeçalho. As figuras Plotly ficam em `charts.py` e o layout
 Streamlit em `app.py`.
 
 ```bash
-uv run dashboard                                         # ou: uv run streamlit run src/smart_hospitals/dashboard/app.py
-uv run pytest tests/dashboard -v                         # smoke test (AppTest) e testes das figuras
+uv run dashboard                  # ou: uv run streamlit run src/smart_hospitals/dashboard/app.py
+uv run pytest tests/dashboard -v  # smoke test (AppTest) e testes das figuras
 ```
 
-### Publicação no Streamlit Community Cloud
+O dashboard abre em http://localhost:8501.
 
-Dashboard publicado: [Dengue SP - Smart Hospitals](https://smarthospitals-ves4qyrifjnibfba9uxikl.streamlit.app/)
+### Publicação no Streamlit Community Cloud
 
 O Cloud usa o primeiro arquivo de dependências que encontra (`uv.lock` vem antes de
 `requirements.txt`), então instala o ambiente pelo `uv.lock` da raiz, inclusive o pacote
@@ -158,10 +142,12 @@ Checklist após cada publicação:
 - [ ] A data de referência e a SE do cabeçalho batem com a última semana do snapshot.
 - [ ] A página funciona no Chrome, no Firefox e no Safari (ou no navegador do celular).
 
-### MCP server
+## MCP server
 
 Servidor MCP local (SDK `mcp` v2, transporte stdio, somente leitura) que expõe os indicadores para
-agentes de IA. Toda resposta traz `data_referencia`, a semana mais recente do snapshot.
+agentes de IA. Toda resposta traz `data_referencia`, a semana mais recente do snapshot. Não há
+previsão numérica de casos: a tendência se avalia por Rt, p_rt1, nível de alerta e `casos_est`
+(nowcast, com intervalo).
 
 | Tool | Parâmetros | Retorno |
 |---|---|---|
@@ -171,10 +157,95 @@ agentes de IA. Toda resposta traz `data_referencia`, a semana mais recente do sn
 | `comparativo_sazonal` | `semana` (1-53, padrão: a mais recente) | mesma SE nos anos anteriores (média, mín., máx.) |
 
 ```bash
-uv run dengue-mcp                                          # ou: uv run python -m smart_hospitals.mcp_server
-claude mcp add dengue-sp -- uv run --directory "$PWD" dengue-mcp   # registrar no Claude Code
+uv run dengue-mcp   # ou: uv run python -m smart_hospitals.mcp_server
 ```
 
-Para inspecionar as tools no navegador: `uv run mcp dev src/smart_hospitals/mcp_server/server.py`.
+O servidor fala pelo stdin/stdout, então quem o inicia é o cliente MCP; rodá-lo à mão só serve para
+ver se sobe. Para inspecionar as tools no navegador: `uv run mcp dev src/smart_hospitals/mcp_server/server.py`.
 Cada chamada é registrada em stderr (tool, parâmetros, duração e status); o stdout é do protocolo.
-O snapshot é carregado uma vez, na inicialização: depois de atualizar o CSV, reinicie o servidor.
+O snapshot é carregado uma vez, na inicialização: depois de atualizar o CSV, reinicie o servidor
+(no Claude Desktop, reinicie o app).
+
+### Conectar ao Claude Code
+
+Na raiz do repositório:
+
+```bash
+claude mcp add dengue-sp -- uv run --directory "$PWD" dengue-mcp
+```
+
+### Conectar ao Claude Desktop
+
+1. Abra o arquivo de configuração do Claude Desktop (em **Settings → Developer → Edit Config**, ou
+   direto no caminho):
+   - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+   - Linux: `~/.config/Claude/claude_desktop_config.json`
+2. Acrescente o servidor em `mcpServers`, trocando `/CAMINHO/ABSOLUTO/smart_hospitals` pelo caminho
+   do clone (`pwd` na raiz do repositório; no Windows, use `/` ou `\\` no caminho):
+
+   ```json
+   {
+     "mcpServers": {
+       "dengue-sp": {
+         "command": "uv",
+         "args": ["--directory", "/CAMINHO/ABSOLUTO/smart_hospitals", "run", "dengue-mcp"]
+       }
+     }
+   }
+   ```
+
+   O Claude Desktop não herda o `PATH` do terminal: se o servidor não aparecer, troque `"uv"` pelo
+   caminho absoluto (`which uv`; no Windows, `where uv`).
+3. Reinicie o Claude Desktop (saia do app, não basta fechar a janela). O servidor `dengue-sp` deve
+   aparecer entre as ferramentas da conversa com as quatro tools: `situacao_atual`, `tendencia`, `serie_historica` e `comparativo_sazonal`. Os logs do
+   servidor ficam em `mcp-server-dengue-sp.log`, na pasta de logs do Claude Desktop.
+
+### Exemplo de uso
+
+Pergunta: "Como está a tendência da dengue em São Paulo?"
+
+O agente chama `situacao_atual`, `tendencia` e `comparativo_sazonal`. Com o snapshot de referência
+2026-10-04 (SE 40/2026), as tools devolvem, entre outros campos (valores arredondados):
+
+```json
+{"nivel_alerta": "laranja", "casos_est": 1161.0, "casos_est_min": 582.0, "casos_est_max": 3114.0,
+ "rt": 0.98, "p_rt1": 0.34, "variacao_semanal": -13.6}
+{"tendencia_resumo": "alta", "rt_medio": 1.1, "p_rt1_medio": 0.73}
+{"semana_epidemiologica": 40, "ano_atual": 1161, "media_historica": 549.9, "anos_comparados": 16}
+```
+
+E a resposta fica assim:
+
+> Na semana de 4/10/2026 (SE 40), São Paulo está em alerta laranja, com cerca de 1.161 casos
+> estimados (intervalo de 582 a 3.114), o dobro da média da mesma semana nos 16 anos anteriores
+> (550). Nas últimas 4 semanas o Rt médio foi 1,1, com 73% de probabilidade de Rt > 1, e o
+> indicador de tendência é de **alta**. Na semana mais recente, porém, o Rt caiu para 0,98 e os casos
+> estimados recuaram 13,6%: vale acompanhar as próximas semanas antes de concluir que a alta
+> perdeu força.
+
+## Estrutura do projeto
+
+```
+smart_hospitals/
+├── src/smart_hospitals/
+│   ├── data/          # módulo de dados compartilhado (snapshot e indicadores)
+│   ├── dashboard/     # aplicação Streamlit (app.py, charts.py)
+│   └── mcp_server/    # MCP server (stdio)
+├── data/              # snapshot CSV do InfoDengue
+├── notebooks/         # análise exploratória
+├── tests/             # pytest: data, dashboard, mcp_server, scripts, integration
+├── scripts/           # extract_infodengue.py e scripts do template (new-project.sh, setup.sh)
+├── docs/              # visualizações aprovadas e guia do fluxo de trabalho
+└── memories/          # decisões do projeto (Basic Memory)
+```
+
+## Dados
+
+Os dados vêm da API pública do [InfoDengue](https://info.dengue.mat.br/) (endpoint `alertcity`),
+projeto da Fiocruz e da FGV:
+
+- Município: São Paulo (IBGE 3550308)
+- Doença: dengue
+- Período: da semana epidemiológica 1/2010 até a mais recente disponível
+- Atualização: manual, sob demanda (veja [Atualizar o snapshot de dados](#atualizar-o-snapshot-de-dados))

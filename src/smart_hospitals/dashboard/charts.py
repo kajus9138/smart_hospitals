@@ -41,6 +41,11 @@ def fmt_int(valor: float) -> str:
     return f"{valor:,.0f}".replace(",", ".")
 
 
+def texto_nivel_alerta(nivel: AlertLevel) -> str:
+    """Nome do nível em Markdown do Streamlit, com a mesma cor das faixas da série."""
+    return f':color[{nivel.capitalize()}]{{foreground="{LEVEL_COLORS[nivel]}"}}'
+
+
 def preparar(df: pd.DataFrame) -> pd.DataFrame:
     """Acrescenta ano, semana e nome do nível de alerta ao snapshot (sem alterar o original)."""
     out = df.copy()
@@ -218,8 +223,8 @@ def fig_sparkline(dados: pd.DataFrame, tendencia: Trend) -> go.Figure:
     fig.update_xaxes(visible=False)
     fig.update_yaxes(visible=False)
     fig.update_layout(
-        height=140,
-        margin={"l": 10, "r": 10, "t": 30, "b": 10},
+        height=250,  # acompanha a altura da grade 2x2 de KPIs ao lado
+        margin={"l": 10, "r": 10, "t": 40, "b": 10},
         separators=",.",
         title={
             "text": (
@@ -240,7 +245,10 @@ def fig_medidores(situacao: SituacaoAtual) -> go.Figure:
         rows=1,
         cols=2,
         specs=[[{"type": "indicator"}] * 2],
-        subplot_titles=["Rt (número de reprodução)", "Probabilidade de transmissão em crescimento"],
+        subplot_titles=[
+            "Rt<br>(número de reprodução)",
+            "Probabilidade de transmissão<br>em crescimento (p_rt1)",
+        ],
         horizontal_spacing=0.15,
     )
     fig.add_trace(
@@ -280,6 +288,8 @@ def fig_medidores(situacao: SituacaoAtual) -> go.Figure:
         1,
         2,
     )
-    fig.update_annotations(yshift=20, font_size=15)
-    fig.update_layout(height=320, margin={"t": 80, "b": 20}, separators=",.")
+    fig.update_annotations(yshift=30, font_size=14)
+    fig.update_layout(
+        height=340, margin={"t": 100, "b": 20, "l": 40, "r": 40}, separators=",."
+    )  # margens laterais para as marcas das pontas (0%, 100%) não serem cortadas
     return fig

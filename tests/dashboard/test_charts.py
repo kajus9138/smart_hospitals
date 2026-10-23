@@ -14,6 +14,7 @@ from smart_hospitals.dashboard.charts import (
     fig_sparkline,
     fmt_int,
     preparar,
+    texto_nivel_alerta,
 )
 from smart_hospitals.data.indicators import calcular_situacao_atual
 
@@ -123,3 +124,14 @@ def test_fig_medidores_extends_rt_axis_during_outbreaks(sample_dengue_data: pd.D
 
     assert tuple(rt.gauge.axis.range) == (0, 4)
     assert rt.gauge.steps[-1].range == (1.1, 4)
+
+
+def test_texto_nivel_alerta_uses_level_color() -> None:
+    assert texto_nivel_alerta("laranja") == ':color[Laranja]{foreground="#ef6c00"}'
+
+
+def test_fig_medidores_titles_fit_in_half_width(sample_dengue_data: pd.DataFrame) -> None:
+    fig = fig_medidores(calcular_situacao_atual(sample_dengue_data))
+
+    # títulos longos quebrados em linhas para não serem cortados na coluna
+    assert all(len(line) <= 30 for a in fig.layout.annotations for line in a.text.split("<br>"))

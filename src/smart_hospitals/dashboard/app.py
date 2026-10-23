@@ -13,6 +13,7 @@ from smart_hospitals.dashboard.charts import (
     fig_sparkline,
     fmt_int,
     preparar,
+    texto_nivel_alerta,
 )
 from smart_hospitals.data import (
     calcular_situacao_atual,
@@ -40,10 +41,11 @@ st.caption(
     f"(Semana Epidemiológica {df.iloc[-1]['SE']})"
 )
 
-# Situação atual (KPIs) e tendência recente
-kpis, spark = st.columns([3, 1])
+# Situação atual (KPIs) em grade 2x2, para os rótulos caberem inteiros, e tendência recente ao lado
+kpis, spark = st.columns([2, 1])
 with kpis:
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2 = st.columns(2)
+    c3, c4 = st.columns(2)
     c1.metric(
         "Casos estimados na semana",
         fmt_int(situacao.casos_est),
@@ -52,7 +54,12 @@ with kpis:
         help=f"Nowcast do InfoDengue; notificados até agora: {fmt_int(situacao.casos_notificados)}",
         border=True,
     )
-    c2.metric("Nível de alerta", situacao.nivel_alerta.capitalize(), border=True)
+    c2.metric(
+        "Nível de alerta",
+        texto_nivel_alerta(situacao.nivel_alerta),
+        help="Nível do InfoDengue: verde, amarelo, laranja ou vermelho",
+        border=True,
+    )
     c3.metric("Rt", f"{situacao.rt:.2f}".replace(".", ","), border=True)
     c4.metric(
         "Incidência por 100 mil hab.",
@@ -60,7 +67,12 @@ with kpis:
         border=True,
     )
 with spark:
-    st.plotly_chart(fig_sparkline(df, tendencia.tendencia_resumo), width="stretch")
+    # sem barra de ferramentas: ela cobriria o título com a tendência
+    st.plotly_chart(
+        fig_sparkline(df, tendencia.tendencia_resumo),
+        width="stretch",
+        config={"displayModeBar": False},
+    )
 
 st.plotly_chart(fig_serie(df), width="stretch")
 

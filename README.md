@@ -115,6 +115,49 @@ uv run dashboard                                         # ou: uv run streamlit 
 uv run pytest tests/dashboard -v                         # smoke test (AppTest) e testes das figuras
 ```
 
+### Publicação no Streamlit Community Cloud
+
+Dashboard publicado: _(URL a preencher após o primeiro deploy)_
+
+O Cloud usa o primeiro arquivo de dependências que encontra (`uv.lock` vem antes de
+`requirements.txt`), então instala o ambiente pelo `uv.lock` da raiz, inclusive o pacote
+`smart_hospitals`. Não crie arquivo de dependências na raiz nem na pasta do `app.py`: um
+`requirements.txt` na raiz seria ignorado e, na pasta do app, qualquer um deles teria prioridade sem
+instalar o pacote (`tests/test_deploy.py` verifica isso). Também não há `.streamlit/config.toml`: o
+dashboard usa o tema padrão aprovado na task 7. Não há secrets: os
+dados vêm do snapshot versionado.
+
+Primeira publicação (manual, feita pelo responsável):
+
+1. Entrar em https://share.streamlit.io com a conta do GitHub dona do repositório.
+2. **Create app** → **Deploy a public app from GitHub**.
+3. Repositório `kajus9138/smart_hospitals`, branch `main`, arquivo principal
+   `src/smart_hospitals/dashboard/app.py`.
+4. Em **Advanced settings**, Python **3.12**. A versão do Python só muda apagando e republicando o app.
+5. **Deploy** e acompanhar o log do build.
+
+Depois disso, cada merge na `main` republica o app sozinho. Para atualizar os dados, basta
+atualizar o snapshot (seção acima) e fazer o merge.
+
+Se algo falhar, leia o log do build antes de mudar o formato. Pontos a conferir no primeiro deploy:
+
+- `load_snapshot` acha o CSV por caminho relativo ao código (`data/` na raiz do repositório). Isso
+  exige instalação editável, que é o padrão do `uv sync`. Um `FileNotFoundError` no app indica que o
+  Cloud instalou o pacote em `site-packages`.
+- O `uv sync` padrão também instala o grupo `dev` (Jupyter, ruff, mypy...). Se o build ficar lento ou
+  estourar recursos, vale tirar o grupo `dev` do padrão no `pyproject.toml`.
+- Plano B: um `requirements.txt` com as dependências do `pyproject.toml` mais o próprio pacote;
+  nesse caso, ajuste `tests/test_deploy.py`.
+
+Checklist após cada publicação:
+
+- [ ] A URL responde HTTP 200.
+- [ ] Com o app acordado, a página carrega em menos de 5 s (o despertar do plano gratuito não conta).
+- [ ] Série com níveis de alerta, KPIs, sparkline, comparação sazonal e medidores de Rt/p_rt1
+      aparecem sem erro.
+- [ ] A data de referência e a SE do cabeçalho batem com a última semana do snapshot.
+- [ ] A página funciona no Chrome, no Firefox e no Safari (ou no navegador do celular).
+
 ### MCP server
 
 Servidor MCP local (SDK `mcp` v2, transporte stdio, somente leitura) que expõe os indicadores para

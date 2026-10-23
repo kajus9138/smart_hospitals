@@ -117,7 +117,7 @@ uv run pytest tests/dashboard -v                         # smoke test (AppTest) 
 
 ### Publicação no Streamlit Community Cloud
 
-Dashboard publicado: _(URL a preencher após o primeiro deploy)_
+Dashboard publicado: [Dengue SP - Smart Hospitals](https://smarthospitals-ves4qyrifjnibfba9uxikl.streamlit.app/)
 
 O Cloud usa o primeiro arquivo de dependências que encontra (`uv.lock` vem antes de
 `requirements.txt`), então instala o ambiente pelo `uv.lock` da raiz, inclusive o pacote

@@ -25,6 +25,15 @@ Origem: task 8, PR #13, em 2026-10-23.
 - Deploy manual pelo responsável em share.streamlit.io: branch `main`, `src/smart_hospitals/dashboard/app.py`,
   Python 3.12. Passo a passo e checklist no README.
 
+## Resultado do deploy (2026-10-23)
+- URL: https://smarthospitals-ves4qyrifjnibfba9uxikl.streamlit.app/
+- O build pelo `uv.lock` funcionou sem `requirements.txt`, e o snapshot foi encontrado (o risco da instalação editável
+  não se confirmou).
+- Acesso anônimo passa por um redirecionamento 303 para `share.streamlit.io/-/auth/app`, que grava um cookie e
+  volta para o app. Sem cookie, o `curl -L` entra em loop. Com cookie (`-c/-b`), recebe HTTP 200 em cerca de 2 s na
+  primeira visita e 0,5 s depois.
+- Health check do app: `<url>/~/+/_stcore/health` (o `/_stcore/health` direto cai no redirecionamento de auth).
+
 ## Alternativas descartadas
 - `requirements.txt` na raiz (spec original): seria ignorado por causa do `uv.lock` e ainda trazia versões
   desatualizadas (pandas>=2).
@@ -39,7 +48,8 @@ Origem: task 8, PR #13, em 2026-10-23.
 - [decision] Cloud instala pelo uv.lock da raiz; sem requirements.txt #deploy
 - [decision] Sem .streamlit/config.toml; tema padrão aprovado #deploy
 - [fact] Streamlit Cloud prioriza uv.lock sobre requirements.txt e a pasta do entrypoint sobre a raiz #streamlit
-- [risk] SNAPSHOT_PATH depende de instalação editável #deploy
+- [risk] SNAPSHOT_PATH depende de instalação editável (ok no Cloud em 2026-10-23) #deploy
+- [fact] Health do app no Cloud fica em /~/+/_stcore/health #streamlit
 
 ## Relations
 - implements [[Stack Python e publicação no Streamlit Community Cloud]]

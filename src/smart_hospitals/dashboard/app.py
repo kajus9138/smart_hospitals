@@ -80,4 +80,5 @@ sazonal, medidores = st.columns(2)
 with sazonal:
     st.plotly_chart(fig_sazonal(df), width="stretch")
 with medidores:
-    st.plotly_chart(fig_medidores(situacao), width="stretch")
+    # sem barra de ferramentas: ela cobriria o título do medidor da direita
+    st.plotly_chart(fig_medidores(situacao), width="stretch", config={"displayModeBar": False})

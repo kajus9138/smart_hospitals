@@ -288,8 +288,8 @@ def fig_medidores(situacao: SituacaoAtual) -> go.Figure:
         1,
         2,
     )
-    fig.update_annotations(yshift=30, font_size=14)
+    fig.update_annotations(yshift=10, font_size=14)
     fig.update_layout(
-        height=340, margin={"t": 100, "b": 20, "l": 40, "r": 40}, separators=",."
+        height=260, margin={"t": 60, "b": 20, "l": 40, "r": 40}, separators=",."
     )  # margens laterais para as marcas das pontas (0%, 100%) não serem cortadas
     return fig

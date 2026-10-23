@@ -374,17 +374,18 @@
         "id": "7",
         "title": "Aprovação humana 2: validar design do protótipo do dashboard",
         "description": "O responsável humano roda o protótipo do dashboard localmente e aprova o design (layout, gráficos, textos, data de referência). Ponto de aprovação bloqueante: a publicação no Streamlit Community Cloud só acontece após esta aprovação.",
-        "details": "Tarefa executada por um humano, não pelo agente. O agente prepara as instruções para rodar localmente (uv run streamlit run ...) e aplica os ajustes pedidos em tarefas/subtarefas separadas. Critério de conclusão: aprovação explícita do responsável humano registrada nesta tarefa (task-master update-task).",
-        "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "6"
         ],
         "priority": "high",
+        "details": "**Aprovação registrada em 2026-10-23 por Kaique.**\n\nProtótipo local do dashboard (branch `feat/6-dashboard-streamlit`, PR #11) validado após os seguintes ajustes:\n\n1. **Nível de alerta colorido**: função `texto_nivel_alerta()` em `src/smart_hospitals/dashboard/charts.py` agora retorna texto com emoji colorido apropriado (🟢/🟡/🟠/🔴)\n2. **Rótulos completos (KPIs em grade 2x2)**: Layout reestruturado em `src/smart_hospitals/dashboard/app.py:44-68` com grade 2x2 para que os rótulos (Casos estimados, Nível de alerta, Rt, Incidência) não sejam truncados\n3. **Espaçamento dos medidores**: Gap removido entre títulos e medidores em `src/smart_hospitals/dashboard/charts.py` (commit 741b60c)\n\nCommits de ajuste:\n- `6a60be3`: fix: color alert level and keep dashboard labels from truncating (task 6)\n- `741b60c`: fix: remove gap between gauge titles and gauges (task 6)\n\nTarefa originalmente executada por um humano. O agente preparou as instruções para rodar localmente (`uv run streamlit run src/smart_hospitals/dashboard/app.py`) e aplicou os ajustes pedidos. Critério de conclusão atingido: aprovação explícita do responsável humano registrada.",
+        "testStrategy": "Validação manual concluída: o responsável humano rodou o protótipo localmente e confirmou que layout, gráficos, textos e data de referência estão corretos. O dashboard está pronto para publicação no Streamlit Community Cloud (Task 8).",
         "subtasks": [],
         "complexity": 1,
         "recommendedSubtasks": 0,
-        "expansionPrompt": "This is a human-only task requiring manual validation of the running dashboard prototype. No subtasks needed - the agent provides instructions for running locally (uv run streamlit run ...) and applies requested adjustments in separate tasks. The agent cannot perform the approval itself."
+        "expansionPrompt": "This is a human-only task requiring manual validation of the running dashboard prototype. No subtasks needed - the agent provides instructions for running locally (uv run streamlit run ...) and applies requested adjustments in separate tasks. The agent cannot perform the approval itself.",
+        "updatedAt": "2026-10-23T13:57:15.488Z"
       },
       {
         "id": "8",
@@ -720,9 +721,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-10-23T12:46:00.404Z",
+      "lastModified": "2026-10-23T13:57:15.488Z",
       "taskCount": 12,
-      "completedCount": 8,
+      "completedCount": 9,
       "tags": [
         "master"
       ]

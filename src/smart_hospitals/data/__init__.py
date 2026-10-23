@@ -2,7 +2,7 @@
 
 from smart_hospitals.data.indicators import (
     AlertLevel,
-    ParametroInvalido,
+    ParametroInvalidoError,
     SituacaoAtual,
     Tendencia,
     Trend,
@@ -16,7 +16,7 @@ from smart_hospitals.data.loader import SNAPSHOT_PATH, get_reference_date, load_
 __all__ = [
     "SNAPSHOT_PATH",
     "AlertLevel",
-    "ParametroInvalido",
+    "ParametroInvalidoError",
     "SituacaoAtual",
     "Tendencia",
     "Trend",

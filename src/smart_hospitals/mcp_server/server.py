@@ -48,9 +48,9 @@ def logged[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     """Registra em stderr cada chamada executada (nome, parâmetros, duração, status) - RNF02.
 
     Chamadas barradas pelo schema (tipo ou intervalo) nem chegam aqui; o próprio SDK as registra
-    em stderr ("Tool '<nome>' rejected arguments"). ParametroInvalido vira ToolError, cuja mensagem
-    chega ao cliente; qualquer outra exceção é registrada com traceback e repassada, e o cliente
-    recebe só um erro genérico.
+    em stderr ("Tool '<nome>' rejected arguments"). ParametroInvalidoError vira ToolError, cuja
+    mensagem chega ao cliente; qualquer outra exceção é registrada com traceback e repassada, e o
+    cliente recebe só um erro genérico.
     """
     signature = inspect.signature(func)
 
@@ -73,7 +73,7 @@ def logged[**P, R](func: Callable[P, R]) -> Callable[P, R]:
 
         try:
             result = func(*args, **kwargs)
-        except data.ParametroInvalido as exc:
+        except data.ParametroInvalidoError as exc:
             log(f"erro: {exc}")
             raise ToolError(str(exc)) from exc
         except Exception:

@@ -20,7 +20,7 @@ Origem: task 9, implementada em `src/smart_hospitals/mcp_server/server.py` em 20
 - **Validação em duas camadas**: tipo e intervalo pelo schema (`Annotated[int, Field(ge=1, le=52)]`);
   formato de SE/data e ordem do intervalo pelo módulo de dados. `inicio`/`fim` aceitam `str | int`
   (agentes mandam SE como número JSON). `semana` vai até 53, como o módulo de dados.
-- **Erros**: o módulo de dados levanta `ParametroInvalido` (subclasse de `ValueError`) só para erro de
+- **Erros**: o módulo de dados levanta `ParametroInvalidoError` (subclasse de `ValueError`) só para erro de
   parâmetro; o decorator `@logged` converte em `ToolError`, cuja mensagem chega ao modelo. Qualquer outra
   exceção (inclusive `ValueError` interno, como NaN em `int()`) é logada com traceback e o cliente recebe
   só "Error executing tool X".
@@ -47,7 +47,7 @@ apontou que converter todo `ValueError` mascarava bugs de dados como erro do usu
   ver [[Indicadores do módulo de dados - regras de cálculo]]).
 
 ## Observations
-- [decision] Só ParametroInvalido vira ToolError; erro interno fica genérico para o cliente #mcp
+- [decision] Só ParametroInvalidoError vira ToolError; erro interno fica genérico para o cliente #mcp
 - [convention] Tools do MCP são finas: validação de schema + delegação ao módulo de dados #mcp
 - [decision] Snapshot carregado na inicialização; reiniciar após atualizar o CSV #mcp #dados
 - [fact] O SDK mcp v2 loga em stderr as chamadas rejeitadas pelo schema #observabilidade

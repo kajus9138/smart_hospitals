@@ -8,15 +8,17 @@ repos:
       - id: end-of-file-fixer
         exclude: ^\.taskmaster/
       - id: check-yaml
+      - id: check-toml
       # uv.lock e o notebook de análise (versionado com saídas, para revisão
       # no GitHub) precisam ser versionados mesmo passando de 500 KB
       - id: check-added-large-files
+        args: ['--maxkb=500']
         exclude: ^(uv\.lock|notebooks/analise_dengue_sp\.ipynb)$
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.1
     hooks:
       - id: ruff-check
-        args: [--fix]
+        args: [--fix, --exit-non-zero-on-fix]
       - id: ruff-format
   - repo: local
     hooks:
@@ -33,7 +35,8 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
-      - id: run-tests
+      # cobertura mínima (80%) vem de [tool.coverage.report] fail_under no pyproject
+      - id: pytest
         name: Run tests
         entry: uv run pytest -q
         language: system

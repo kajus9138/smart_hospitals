@@ -25,7 +25,7 @@ rode só `scripts/setup.sh` na raiz do projeto novo.
 | `dev-workflow.md` | O passo a passo por tarefa. Preencha as convenções e os comandos do projeto |
 | `.mcp.json` | MCPs do projeto: Task Master e Basic Memory |
 | `.claude/settings.json` | Permissões: bloqueia `--no-verify`, push forçado e leitura do `.env` |
-| `.pre-commit-config.yaml` | Bloqueia commit na `main` + checagens básicas; ative o hook de testes |
+| `.pre-commit-config.yaml` | Gates do commit: ruff (lint e format), mypy, pytest (cobertura ≥ 80%), bloqueio da `main` e arquivos ≤ 500 KB |
 | `.taskmaster/` | Config do Task Master (claude-code + Perplexity) e template de PRD |
 | `memories/` | Base do Basic Memory, versionada no Git |
 | `scripts/` | `new-project.sh` e `setup.sh` |

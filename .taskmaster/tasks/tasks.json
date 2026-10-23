@@ -685,14 +685,14 @@
           "10",
           "8"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
             "title": "Update README.md with installation and basic usage instructions",
             "description": "Write the main README.md sections covering project overview, requirements, installation with uv, snapshot update command, local dashboard execution, and test commands.",
             "dependencies": [],
-            "details": "Create or update README.md with: (1) Project title and description (Dashboard Epidemiológico Dengue SP); (2) Link to published dashboard (placeholder URL until task 8 completes); (3) Requirements section (Python 3.12+, uv); (4) Installation instructions (git clone, uv sync); (5) Snapshot update command (uv run python scripts/extract_infodengue.py); (6) Local dashboard run command (uv run streamlit run src/smart_hospitals/dashboard/app.py); (7) Test commands (uv run pytest --cov, pytest -v, etc.). Verify each code block executes correctly by running the commands.",
+            "details": "Create or update README.md with: (1) Project title and description (Dashboard Epidemiológico Dengue SP); (2) Link to published dashboard (placeholder URL until task 8 completes); (3) Requirements section (Python 3.12+, uv); (4) Installation instructions (git clone, uv sync); (5) Snapshot update command (uv run python scripts/extract_infodengue.py); (6) Local dashboard run command (uv run streamlit run src/smart_hospitals/dashboard/app.py); (7) Test commands (uv run pytest --cov, pytest -v, etc.). Verify each code block executes correctly by running the commands.\n<info added on 2026-10-23T15:34:34.765Z>\nREADME rewritten with project-focused content. Template text moved to docs/template-workflow.md. Commands validated: uv sync succeeded; pytest --cov passed all tests; pytest tests/data/ ran data tests; pytest -m \"not integration\" skipped integration tests; scripts/extract_infodengue.py --help showed usage; local dashboard (uv run streamlit run) responded HTTP 200 on localhost:8501; Streamlit Cloud URL responded HTTP 200 when using cookies (without cookie, 303 redirect loop due to auth). Section added documenting MCP server connection to Claude Code (one-liner) and Claude Desktop (config file + restart).\n</info added on 2026-10-23T15:34:34.765Z>",
             "status": "pending",
             "testStrategy": "Execute each code block in the README to verify: uv sync completes, extract script runs (if data module exists), streamlit command starts the server, pytest commands work. Check for typos in paths and command syntax.",
             "parentId": "undefined"
@@ -704,7 +704,7 @@
             "dependencies": [
               1
             ],
-            "details": "Add README section for MCP server integration: (1) Command to start MCP server (uv run python -m smart_hospitals.mcp_server); (2) Claude Desktop configuration with correct JSON for claude_desktop_config.json showing mcpServers entry with command, args, and cwd; (3) Tool descriptions for situacao_atual(), tendencia(semanas), serie_historica(inicio, fim), and comparativo_sazonal(semana); (4) Instructions to restart Claude Desktop and verify tools are available. Ensure the cwd path placeholder is clearly marked for user customization.",
+            "details": "Add README section for MCP server integration: (1) Command to start MCP server (uv run python -m smart_hospitals.mcp_server); (2) Claude Desktop configuration with correct JSON for claude_desktop_config.json showing mcpServers entry with command, args, and cwd; (3) Tool descriptions for situacao_atual(), tendencia(semanas), serie_historica(inicio, fim), and comparativo_sazonal(semana); (4) Instructions to restart Claude Desktop and verify tools are available. Ensure the cwd path placeholder is clearly marked for user customization.\n<info added on 2026-10-23T15:34:59.327Z>\nI'll analyze the codebase to understand the current MCP server implementation and verify the configuration approach before generating the subtask update.I have analyzed the codebase. The README.md at lines 169-202 already contains the MCP server configuration documentation for Claude Desktop, and it uses the `--directory` approach (not `cwd`). The user is confirming that this approach aligns with official MCP documentation via Context7 and that the JSON has been validated with the server responding to initialize via stdio.\n\nBased on the user request, here is the update text:\n\nValidated configuration: Claude Desktop uses `uv --directory <path> run dengue-mcp` pattern instead of cwd property (confirmed with official MCP documentation via Context7). The JSON configuration has been validated and the server successfully responds to initialize requests via stdio transport.\n</info added on 2026-10-23T15:34:59.327Z>",
             "status": "pending",
             "testStrategy": "Verify MCP server starts with the documented command. Validate JSON syntax in claude_desktop_config.json example. Cross-reference tool names with actual MCP server implementation from task 9.",
             "parentId": "undefined"
@@ -717,7 +717,7 @@
               1,
               2
             ],
-            "details": "Add final README sections: (1) Project structure tree showing src/smart_hospitals/ (data, dashboard, mcp_server), data/, notebooks/, tests/, scripts/, docs/ directories; (2) Data section explaining InfoDengue API source, municipality (São Paulo IBGE 3550308), disease (Dengue), period (2010 onwards), and manual update process; (3) Example MCP usage scenario showing a user question about dengue trends and a sample agent response using MCP data (Rt, alert level, weekly variation, recommendations); (4) MIT License reference. Verify directory structure matches actual project layout.",
+            "details": "Add final README sections: (1) Project structure tree showing src/smart_hospitals/ (data, dashboard, mcp_server), data/, notebooks/, tests/, scripts/, docs/ directories; (2) Data section explaining InfoDengue API source, municipality (São Paulo IBGE 3550308), disease (Dengue), period (2010 onwards), and manual update process; (3) Example MCP usage scenario showing a user question about dengue trends and a sample agent response using MCP data (Rt, alert level, weekly variation, recommendations); (4) MIT License reference. Verify directory structure matches actual project layout.\n<info added on 2026-10-23T15:35:39.310Z>\nI need to analyze the codebase to provide accurate information for this subtask update. Let me explore the project structure and understand the current implementation.Now let me check the MCP server tools to see their real outputs and the data from 2026-10-04:Now let me check the data indicators module to understand what data is returned by the tools and check the CSV data file for the most recent date around 2026-10-04:Now I have the real data from 2026-10-04 (SE 202640). Let me also check the current README to see what exists:Now I have all the context I need. Based on the user request and the analysis:\n\n1. **Real tool outputs** from 2026-10-04 (SE 202640) are already present in the README (lines 211-215)\n2. **No numerical predictions or purchase recommendations** - the example response (lines 220-225) correctly avoids predictions but mentions \"alta\" - I should note the user wants no recommendations\n3. **License**: user confirms no LICENSE file exists by decision of the project owner - this should be noted\n4. **Directory tree verified** with `ls` - confirmed the structure matches\n\nBased on the CSV data from 2026-10-04:\n- SE: 202640\n- casos_est: 1161.0\n- casos_est_min: 582.0 (though CSV shows 582)\n- casos_est_max: 3114.0\n- nivel: 3 (laranja)\n- Rt: 0.9828631 (~0.98)\n- p_rt1: 0.3378475 (~0.34)\n\nHere is my response with the new text to be appended:\n\nExemplo de uso atualizado com saídas reais das tools (snapshot de referência 2026-10-04, SE 40/2026). Valores extraídos do CSV: casos_est 1161, intervalo 582-3114, nível 3 (laranja), Rt 0.98, p_rt1 0.34. A resposta do agente não deve incluir previsão numérica de casos futuros nem recomendações de compra de insumos, conforme instrução do servidor MCP. Licença: omitida intencionalmente por decisão do responsável pelo repositório (o repositório não possui arquivo LICENSE). Árvore de diretórios verificada com ls e corresponde à estrutura documentada: src/smart_hospitals/ (data, dashboard, mcp_server), data/, notebooks/, tests/, scripts/, docs/, memories/.\n</info added on 2026-10-23T15:35:39.310Z>",
             "status": "pending",
             "testStrategy": "Compare documented project structure against actual directory layout using ls/tree. Verify InfoDengue attribution matches data source. Ensure example MCP response aligns with actual tool output format from task 9 implementation.",
             "parentId": "undefined"
@@ -725,14 +725,15 @@
         ],
         "complexity": 3,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down documentation into: 1) Update README.md with installation instructions (uv, clone, sync), snapshot update command, and local dashboard run command; 2) Document MCP server connection to Claude Desktop including claude_desktop_config.json example and tool descriptions; 3) Add project structure explanation, data source attribution (InfoDengue), and example MCP usage scenario from PRD section 3. Verify all code blocks execute correctly."
+        "expansionPrompt": "Break down documentation into: 1) Update README.md with installation instructions (uv, clone, sync), snapshot update command, and local dashboard run command; 2) Document MCP server connection to Claude Desktop including claude_desktop_config.json example and tool descriptions; 3) Add project structure explanation, data source attribution (InfoDengue), and example MCP usage scenario from PRD section 3. Verify all code blocks execute correctly.",
+        "updatedAt": "2026-10-23T15:36:37.718Z"
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-10-23T15:13:34.846Z",
+      "lastModified": "2026-10-23T15:36:37.718Z",
       "taskCount": 12,
-      "completedCount": 11,
+      "completedCount": 12,
       "tags": [
         "master"
       ]

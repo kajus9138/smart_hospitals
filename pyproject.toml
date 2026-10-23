@@ -16,6 +16,7 @@ dependencies = [
 
 [project.scripts]
 dengue-mcp = "smart_hospitals.mcp_server.server:main"
+dashboard = "smart_hospitals.dashboard.__main__:main"
 
 [build-system]
 requires = ["uv_build>=0.13.1,<0.14.0"]
@@ -64,6 +65,9 @@ markers = [
 
 [tool.coverage.run]
 source = ["smart_hospitals", "scripts"]
+# AppTest executa uma cópia temporária do app.py, que o coverage não associa ao arquivo original;
+# o app é coberto pelo smoke test (tests/dashboard/test_app.py) e as figuras por test_charts.py.
+omit = ["src/smart_hospitals/dashboard/app.py"]
 
 [tool.coverage.report]
 fail_under = 80

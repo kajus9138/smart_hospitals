@@ -74,14 +74,18 @@ Revise o diff do CSV e faça o commit.
 
 ```python
 from smart_hospitals.data import (
-    calcular_situacao_atual, calcular_tendencia, comparativo_sazonal, load_snapshot, serie_historica,
+    calcular_situacao_atual,
+    calcular_tendencia,
+    comparativo_sazonal,
+    load_snapshot,
+    serie_historica,
 )
 
-df = load_snapshot()                              # valida colunas e ordena por SE
-calcular_situacao_atual(df)                       # última SE: nowcast, nível, Rt, variação semanal
-calcular_tendencia(df, semanas=4)                 # alta / estavel / queda pelas médias de Rt e p_rt1
-serie_historica(df, "2024-01-01", "2024-12-31")   # ou por SE: serie_historica(df, 202401, 202452)
-comparativo_sazonal(df)                           # mesma SE nos anos anteriores
+df = load_snapshot()  # valida colunas e ordena por SE
+calcular_situacao_atual(df)  # última SE: nowcast, nível, Rt, variação semanal
+calcular_tendencia(df, semanas=4)  # alta / estavel / queda pelas médias de Rt e p_rt1
+serie_historica(df, "2024-01-01", "2024-12-31")  # ou por SE: serie_historica(df, 202401, 202452)
+comparativo_sazonal(df)  # mesma SE nos anos anteriores
 ```
 
 Séries e comparativos saem prontos para JSON (datas ISO, valores ausentes como `None`).
@@ -99,6 +103,17 @@ uv run jupyter nbconvert --to notebook --execute --inplace notebooks/analise_den
 ```
 
 Depois de atualizar o snapshot, reexecute com o segundo comando e revise os números citados no texto.
+
+### Dashboard
+
+`src/smart_hospitals/dashboard/` mostra só as visualizações aprovadas em `docs/visualizacoes.md`,
+com a data de referência (e a SE) no cabeçalho. As figuras Plotly ficam em `charts.py` e o layout
+Streamlit em `app.py`.
+
+```bash
+uv run dashboard                                         # ou: uv run streamlit run src/smart_hospitals/dashboard/app.py
+uv run pytest tests/dashboard -v                         # smoke test (AppTest) e testes das figuras
+```
 
 ### MCP server
 

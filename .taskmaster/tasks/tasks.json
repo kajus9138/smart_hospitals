@@ -208,7 +208,7 @@
         "id": "4",
         "title": "Create Jupyter Notebook for Data Analysis",
         "description": "Develop an exploratory data analysis notebook that analyzes the InfoDengue data and proposes visualization options for the dashboard, to be reviewed and approved by the human responsible.",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           "2",
           "3"
@@ -273,7 +273,7 @@
         "complexity": 4,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Break down notebook creation into: 1) Data overview section - load snapshot, display statistics, data types, sample rows; 2) Time series analysis - plot casos_est over time with alert level color bands and outbreak annotations; 3) Seasonal patterns - create heatmap (weeks x years), box plots by month, identify high/low seasons; 4) Recent trends and visualization proposals - Rt time series, correlation analysis, proposed dashboard visualizations list, and create docs/visualizacoes.md template for human approval.",
-        "updatedAt": "2026-10-22T15:31:26.485Z"
+        "updatedAt": "2026-10-23T12:32:14.800Z"
       },
       {
         "id": "5",
@@ -281,7 +281,7 @@
         "description": "O responsável humano analisa o notebook de EDA e preenche docs/visualizacoes.md com as visualizações escolhidas para o dashboard. Ponto de aprovação bloqueante: a implementação do dashboard só começa após este documento.",
         "details": "Tarefa executada por um humano, não pelo agente. O agente pode criar um template de docs/visualizacoes.md (uma seção por visualização: objetivo, tipo de gráfico, dados/colunas, filtros, observações), mas não deve preencher as escolhas. Critério de conclusão: docs/visualizacoes.md preenchido e commitado pelo responsável humano.",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "4"
         ],
@@ -289,7 +289,8 @@
         "subtasks": [],
         "complexity": 1,
         "recommendedSubtasks": 0,
-        "expansionPrompt": "This is a human-only task requiring manual review and approval. No subtasks needed - the agent cannot perform this work. The agent can only verify that docs/visualizacoes.md template exists (created in Task 4) and remind the human to fill it out."
+        "expansionPrompt": "This is a human-only task requiring manual review and approval. No subtasks needed - the agent cannot perform this work. The agent can only verify that docs/visualizacoes.md template exists (created in Task 4) and remind the human to fill it out.",
+        "updatedAt": "2026-10-23T12:35:10.803Z"
       },
       {
         "id": "6",
@@ -718,9 +719,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-10-22T15:31:26.485Z",
+      "lastModified": "2026-10-23T12:35:10.804Z",
       "taskCount": 12,
-      "completedCount": 5,
+      "completedCount": 7,
       "tags": [
         "master"
       ]

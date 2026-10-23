@@ -2,7 +2,7 @@
   "master": {
     "tasks": [
       {
-        "id": "1",
+        "id": 1,
         "title": "Initialize Python Project with uv",
         "description": "Set up the Python 3.12 project structure using uv as package manager, including pyproject.toml with all dependencies and development tooling configuration.",
         "details": "Create pyproject.toml with:\n- Python 3.12 requirement\n- Production dependencies: pandas, streamlit, plotly, mcp (FastMCP SDK)\n- Development dependencies: pytest, pytest-cov, ruff, mypy, jupyter, seaborn, matplotlib, numpy\n- Tool configurations for ruff (linting/formatting), mypy (type checking), pytest (coverage settings)\n\nProject structure:\n```\nsmart_hospitals/\n├── pyproject.toml\n├── src/\n│   └── smart_hospitals/\n│       ├── __init__.py\n│       ├── data/           # Data module (shared by dashboard and MCP)\n│       │   ├── __init__.py\n│       │   ├── loader.py   # CSV loading and validation\n│       │   └── indicators.py  # Indicator calculations\n│       ├── dashboard/      # Streamlit app\n│       │   └── __init__.py\n│       └── mcp_server/     # MCP server\n│           └── __init__.py\n├── data/\n│   └── .gitkeep           # For CSV snapshot\n├── notebooks/\n│   └── .gitkeep           # For analysis notebook\n├── tests/\n│   ├── __init__.py\n│   ├── conftest.py        # Shared fixtures\n│   └── data/\n│       └── __init__.py\n└── docs/\n    └── .gitkeep           # For visualizacoes.md\n```\n\nRun: `uv init` then edit pyproject.toml, then `uv sync` to create venv and lock file.\n\nUpdate .pre-commit-config.yaml to enable ruff and mypy hooks.\n\nUpdate .gitignore to include Python-specific patterns (__pycache__, *.pyc, .venv/, .pytest_cache/, .mypy_cache/, .coverage, htmlcov/).",
@@ -64,7 +64,7 @@
         "updatedAt": "2026-10-22T13:17:48.091Z"
       },
       {
-        "id": "2",
+        "id": 2,
         "title": "Create Data Extraction Script",
         "description": "Implement a Python script to download dengue data from InfoDengue API for São Paulo (IBGE 3550308) from epidemiological week 1/2010 to the most recent, saving as a versioned CSV snapshot.",
         "details": "Create `scripts/extract_infodengue.py` that:\n\n1. Fetches data from InfoDengue API:\n   - Base URL: `https://info.dengue.mat.br/api/alertcity`\n   - Parameters: geocode=3550308 (São Paulo), disease=dengue, format=csv, ew_start=1, ew_end=52, ey_start=2010, ey_end=<current_year>\n   - API returns CSV directly via pandas.read_csv(url)\n\n2. Data fields from InfoDengue to preserve:\n   - data_iniSE: Start date of epidemiological week\n   - SE: Epidemiological week (YYYYWW format)\n   - casos_est: Estimated cases (nowcast)\n   - casos_est_min, casos_est_max: Confidence interval\n   - casos: Notified cases\n   - p_rt1: Probability Rt > 1\n   - p_inc100k: Incidence per 100k inhabitants\n   - Rt: Effective reproduction number\n   - nivel: Alert level (1=green, 2=yellow, 3=orange, 4=red)\n   - receptession_t: Week susceptible to notification delay\n\n3. Save to `data/dengue_sp_snapshot.csv` with UTF-8 encoding\n\n4. Logging to stderr:\n   - Number of weeks downloaded\n   - Date range covered (first and last epidemiological week)\n   - File size and path\n\nPseudo-code:\n```python\nimport pandas as pd\nimport logging\nimport sys\nfrom datetime import datetime\n\nlogging.basicConfig(level=logging.INFO, stream=sys.stderr)\nlogger = logging.getLogger(__name__)\n\ndef fetch_infodengue_data(geocode: str = \"3550308\", disease: str = \"dengue\") -> pd.DataFrame:\n    current_year = datetime.now().year\n    url = f\"https://info.dengue.mat.br/api/alertcity?geocode={geocode}&disease={disease}&format=csv&ew_start=1&ew_end=52&ey_start=2010&ey_end={current_year}\"\n    logger.info(f\"Fetching data from {url}\")\n    df = pd.read_csv(url)\n    logger.info(f\"Downloaded {len(df)} weeks from SE {df['SE'].min()} to {df['SE'].max()}\")\n    return df\n\ndef main():\n    df = fetch_infodengue_data()\n    output_path = Path(\"data/dengue_sp_snapshot.csv\")\n    df.to_csv(output_path, index=False, encoding=\"utf-8\")\n    logger.info(f\"Saved {output_path.stat().st_size / 1024:.1f} KB to {output_path}\")\n\nif __name__ == \"__main__\":\n    main()\n```",
@@ -120,7 +120,7 @@
         "updatedAt": "2026-10-22T13:43:59.899Z"
       },
       {
-        "id": "3",
+        "id": 3,
         "title": "Implement Data Module with Indicator Calculations",
         "description": "Create the shared data module that loads the CSV snapshot and calculates epidemiological indicators (current situation, trends, historical series, seasonal comparison) used by both dashboard and MCP server. Unit tests are included as part of this task (tests alongside code, per dev-workflow.md).",
         "status": "done",
@@ -205,7 +205,7 @@
         "updatedAt": "2026-10-22T14:19:51.298Z"
       },
       {
-        "id": "4",
+        "id": 4,
         "title": "Create Jupyter Notebook for Data Analysis",
         "description": "Develop an exploratory data analysis notebook that analyzes the InfoDengue data and proposes visualization options for the dashboard, to be reviewed and approved by the human responsible.",
         "status": "done",
@@ -276,7 +276,7 @@
         "updatedAt": "2026-10-23T12:32:14.800Z"
       },
       {
-        "id": "5",
+        "id": 5,
         "title": "Aprovação humana 1: escolher visualizações do dashboard",
         "description": "O responsável humano analisa o notebook de EDA e preenche docs/visualizacoes.md com as visualizações escolhidas para o dashboard. Ponto de aprovação bloqueante: a implementação do dashboard só começa após este documento.",
         "details": "Tarefa executada por um humano, não pelo agente. O agente pode criar um template de docs/visualizacoes.md (uma seção por visualização: objetivo, tipo de gráfico, dados/colunas, filtros, observações), mas não deve preencher as escolhas. Critério de conclusão: docs/visualizacoes.md preenchido e commitado pelo responsável humano.",
@@ -293,7 +293,7 @@
         "updatedAt": "2026-10-23T12:35:10.803Z"
       },
       {
-        "id": "6",
+        "id": 6,
         "title": "Implement Streamlit Dashboard",
         "description": "Build the Streamlit dashboard with Plotly interactive charts displaying the approved visualizations from docs/visualizacoes.md, including current situation display with data reference date prominently shown.",
         "status": "done",
@@ -371,7 +371,7 @@
         "updatedAt": "2026-10-23T12:46:00.404Z"
       },
       {
-        "id": "7",
+        "id": 7,
         "title": "Aprovação humana 2: validar design do protótipo do dashboard",
         "description": "O responsável humano roda o protótipo do dashboard localmente e aprova o design (layout, gráficos, textos, data de referência). Ponto de aprovação bloqueante: a publicação no Streamlit Community Cloud só acontece após esta aprovação.",
         "status": "done",
@@ -388,7 +388,7 @@
         "updatedAt": "2026-10-23T13:57:15.488Z"
       },
       {
-        "id": "8",
+        "id": 8,
         "title": "Publish Dashboard to Streamlit Community Cloud",
         "description": "Deploy the approved dashboard to Streamlit Community Cloud and verify it's accessible via public URL with acceptable load time.",
         "details": "**IMPORTANT:** This task requires Human Approval 2 (design validation) before deployment.\n\n**1. Prepare for Streamlit Cloud:**\n\nCreate `requirements.txt` (Streamlit Cloud reads this, not pyproject.toml):\n```\npandas>=2.0.0\nstreamlit>=1.30.0\nplotly>=5.18.0\n```\n\nCreate `.streamlit/config.toml`:\n```toml\n[theme]\nprimaryColor = \"#1f77b4\"\nbackgroundColor = \"#ffffff\"\nsecondaryBackgroundColor = \"#f0f2f6\"\ntextColor = \"#262730\"\n\n[server]\nheadless = true\nenableCORS = false\nenableXsrfProtection = true\n```\n\n**2. Repository Structure for Deployment:**\n- Ensure `data/dengue_sp_snapshot.csv` is committed and up to date\n- Ensure `src/smart_hospitals/` is importable (has `__init__.py`)\n- Main app file: `src/smart_hospitals/dashboard/app.py`\n\n**3. Streamlit Cloud Configuration:**\n- Connect GitHub repository to Streamlit Community Cloud\n- Set main file path: `src/smart_hospitals/dashboard/app.py`\n- Python version: 3.12\n- No secrets required (public data)\n\n**4. Post-deployment Verification:**\n- Dashboard loads in <5s (excluding cold start)\n- All charts render correctly\n- Reference date displays correctly\n- Test on different browsers\n\n**5. Update README with deployment URL:**\n```markdown\n## Dashboard\n\nAcesse o dashboard publicado: [Smart Hospitals - Dengue SP](https://your-app.streamlit.app)\n```",
@@ -398,27 +398,29 @@
           "6",
           "7"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
             "title": "Create requirements.txt for Streamlit Cloud deployment",
             "description": "Create a requirements.txt file in the repository root with the minimum package versions required for Streamlit Cloud deployment. Streamlit Cloud reads this file instead of pyproject.toml.",
             "dependencies": [],
-            "details": "Create `requirements.txt` in the repository root with:\n```\npandas>=2.0.0\nstreamlit>=1.30.0\nplotly>=5.18.0\n```\n\nStreamlit Community Cloud specifically looks for requirements.txt (not pyproject.toml) to install dependencies. The versions should match or be compatible with those in pyproject.toml to ensure consistency between local development and cloud deployment.",
-            "status": "pending",
+            "details": "Create `requirements.txt` in the repository root with:\n```\npandas>=2.0.0\nstreamlit>=1.30.0\nplotly>=5.18.0\n```\n\nStreamlit Community Cloud specifically looks for requirements.txt (not pyproject.toml) to install dependencies. The versions should match or be compatible with those in pyproject.toml to ensure consistency between local development and cloud deployment.\n<info added on 2026-10-23T14:03:27.023Z>\nResearch findings via Context7 and local simulation:\n\nAccording to Streamlit Community Cloud documentation, dependency file resolution follows priority order: uv.lock > Pipfile > environment.yml > requirements.txt > pyproject.toml. The Cloud checks the entrypoint folder first, then the repository root.\n\nCurrent project state:\n- uv.lock exists at repository root (version 1, revision 5, requires-python >=3.12)\n- No requirements.txt exists\n- pyproject.toml at root defines dependencies: pandas>=3.1.0, plotly>=7.1.0, streamlit>=1.66.1, mcp[cli]>=2.3<3\n- Dashboard entrypoint: src/smart_hospitals/dashboard/app.py (imports smart_hospitals.data.load_snapshot)\n\nLocal simulation (clean clone with uv sync --locked --no-dev):\n- The smart_hospitals package installs correctly as an editable package\n- load_snapshot() reads data/dengue_sp_snapshot.csv successfully\n- Snapshot contains 875 data weeks (876 lines including header), reference date 2026-10-04 (SE 202640)\n\nProposal: Do not create requirements.txt. Since uv.lock exists at root and has higher priority, Streamlit Cloud will use it automatically. This keeps dependency management unified through uv and avoids maintenance burden of keeping two files in sync.\n\nPlan awaiting approval before marking subtask 8.1 as done or skipped.\n</info added on 2026-10-23T14:03:27.023Z>",
+            "status": "cancelled",
             "testStrategy": "Verify requirements.txt exists in repo root, contains all three packages with correct minimum versions, and has no syntax errors. Cross-check versions are compatible with pyproject.toml.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-23T14:11:34.624Z"
           },
           {
             "id": 2,
             "title": "Create .streamlit/config.toml with theme and server settings",
             "description": "Configure Streamlit theme colors and server settings for production deployment in .streamlit/config.toml.",
             "dependencies": [],
-            "details": "Create `.streamlit/config.toml` with theme and server configuration:\n```toml\n[theme]\nprimaryColor = \"#1f77b4\"\nbackgroundColor = \"#ffffff\"\nsecondaryBackgroundColor = \"#f0f2f6\"\ntextColor = \"#262730\"\n\n[server]\nheadless = true\nenableCORS = false\nenableXsrfProtection = true\n```\n\nThe theme section defines consistent colors for the dashboard. Server settings configure headless mode (required for cloud), disable CORS (not needed for same-origin), and enable XSRF protection for security.",
-            "status": "pending",
+            "details": "Create `.streamlit/config.toml` with theme and server configuration:\n```toml\n[theme]\nprimaryColor = \"#1f77b4\"\nbackgroundColor = \"#ffffff\"\nsecondaryBackgroundColor = \"#f0f2f6\"\ntextColor = \"#262730\"\n\n[server]\nheadless = true\nenableCORS = false\nenableXsrfProtection = true\n```\n\nThe theme section defines consistent colors for the dashboard. Server settings configure headless mode (required for cloud), disable CORS (not needed for same-origin), and enable XSRF protection for security.\n<info added on 2026-10-23T14:09:24.232Z>\nImplementation completed: Created `.streamlit/config.toml` with minimal [server] configuration (headless = true only). Omitted [theme] section to preserve the default Streamlit theme approved in task 7. Removed enableCORS=false because it conflicts with enableXsrfProtection and Streamlit overrides it with a warning. Test coverage in `tests/test_deploy.py` verifies headless setting via tomllib parsing and validates Cloud dependency resolution via uv.lock (no requirements.txt). Local smoke test confirmed HTTP 200 health response.\n</info added on 2026-10-23T14:09:24.232Z>\n<info added on 2026-10-23T14:11:52.762Z>\nCode review determined config.toml removal was appropriate: headless=true has no effect on Streamlit Community Cloud (the platform always runs headless) and only prevents the browser from opening automatically during local development, which is undesirable. With no other necessary settings, the entire .streamlit/config.toml file was removed. Subtask cancelled as the configuration file is not needed for Cloud deployment.\n</info added on 2026-10-23T14:11:52.762Z>",
+            "status": "cancelled",
             "testStrategy": "Verify .streamlit/config.toml exists, is valid TOML syntax, contains all required theme colors and server settings. Test locally with `streamlit run` to confirm theme applies correctly.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-23T14:11:34.630Z"
           },
           {
             "id": 3,
@@ -428,10 +430,11 @@
               1,
               2
             ],
-            "details": "Document the manual deployment steps in a deployment guide (can be added to README or separate DEPLOYMENT.md):\n\n1. Go to https://share.streamlit.io and sign in with GitHub\n2. Click 'New app' and select the repository\n3. Configure deployment settings:\n   - Repository: <org>/smart_hospitals\n   - Branch: main\n   - Main file path: src/smart_hospitals/dashboard/app.py\n   - Python version: 3.12\n4. No secrets/environment variables required (public data)\n5. Click 'Deploy'\n\nNote: Actual deployment requires human action in Streamlit Cloud UI - this subtask documents the process for the operator.",
-            "status": "pending",
+            "details": "Document the manual deployment steps in a deployment guide (can be added to README or separate DEPLOYMENT.md):\n\n1. Go to https://share.streamlit.io and sign in with GitHub\n2. Click 'New app' and select the repository\n3. Configure deployment settings:\n   - Repository: <org>/smart_hospitals\n   - Branch: main\n   - Main file path: src/smart_hospitals/dashboard/app.py\n   - Python version: 3.12\n4. No secrets/environment variables required (public data)\n5. Click 'Deploy'\n\nNote: Actual deployment requires human action in Streamlit Cloud UI - this subtask documents the process for the operator.\n<info added on 2026-10-23T14:09:51.738Z>\nThe README already contains a comprehensive \"Publicação no Streamlit Community Cloud\" section. Let me verify the current implementation details match what's documented.Based on my analysis of the README and current implementation:\n\nThe README already contains a detailed \"Publicação no Streamlit Community Cloud\" section (lines 121-155) that covers:\n- Repository: kajus9138/smart_hospitals (public)\n- Branch: main\n- Entrypoint: src/smart_hospitals/dashboard/app.py\n- Python version: 3.12\n- No secrets (public data from versioned snapshot)\n- Plan B: documented fallback to requirements.txt if uv.lock build fails\n- Deployment is manual (via owner's login at share.streamlit.io)\n- Post-deployment checklist\n\nThe documentation matches the user's request exactly. The implementation is complete with .streamlit/config.toml (headless server) and tests/test_deploy.py validating the deployment configuration.\n\nREADME section \"Publicação no Streamlit Community Cloud\" (lines 121-155) already contains: repo kajus9138/smart_hospitals (public), branch main, entrypoint src/smart_hospitals/dashboard/app.py, Python 3.12, no secrets (public snapshot data), dependency resolution via uv.lock, Plan B documented (fallback to requirements.txt if build fails with instructions to adjust tests/test_deploy.py), deployment is manual (owner login required at share.streamlit.io), and post-deployment checklist. Implementation verified: .streamlit/config.toml exists with server.headless=true, tests/test_deploy.py validates uv.lock presence and absence of requirements.txt files.\n</info added on 2026-10-23T14:09:51.738Z>",
+            "status": "done",
             "testStrategy": "Review documentation for completeness and accuracy. Verify main file path matches actual dashboard location. Confirm Python version matches project requirements.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-23T14:11:36.535Z"
           },
           {
             "id": 4,
@@ -448,10 +451,11 @@
         ],
         "complexity": 4,
         "recommendedSubtasks": 4,
-        "expansionPrompt": "Break down deployment into: 1) Create requirements.txt for Streamlit Cloud (pandas, streamlit, plotly with minimum versions); 2) Create .streamlit/config.toml with theme and server settings; 3) Document Streamlit Cloud configuration steps (connect repo, set main file path, Python version) - actual deployment requires human action in Streamlit Cloud UI; 4) Create verification checklist (HTTP 200, load time <5s, all charts render, reference date correct) and update README with deployment URL."
+        "expansionPrompt": "Break down deployment into: 1) Create requirements.txt for Streamlit Cloud (pandas, streamlit, plotly with minimum versions); 2) Create .streamlit/config.toml with theme and server settings; 3) Document Streamlit Cloud configuration steps (connect repo, set main file path, Python version) - actual deployment requires human action in Streamlit Cloud UI; 4) Create verification checklist (HTTP 200, load time <5s, all charts render, reference date correct) and update README with deployment URL.",
+        "updatedAt": "2026-10-23T14:11:36.535Z"
       },
       {
-        "id": "9",
+        "id": 9,
         "title": "Implement MCP Server with FastMCP",
         "description": "Create the MCP server using FastMCP SDK with stdio transport, implementing the four required tools (situacao_atual, tendencia, serie_historica, comparativo_sazonal) with proper parameter validation and logging. Unit tests are included as part of this task (tests alongside code, per dev-workflow.md).",
         "status": "done",
@@ -547,7 +551,7 @@
         "updatedAt": "2026-10-22T14:44:17.951Z"
       },
       {
-        "id": "10",
+        "id": 10,
         "title": "Write Comprehensive Tests",
         "description": "Implement integration tests for the MCP server: (1) start MCP server as subprocess via stdio using the MCP SDK client, verify list_tools returns the four tools and each one responds with valid data including reference date; (2) verify stdout contains only MCP protocol messages; (3) ensure >= 80% coverage on data module and MCP server with pytest-cov (--cov-fail-under=80).",
         "status": "done",
@@ -613,7 +617,7 @@
         "updatedAt": "2026-10-22T14:58:58.721Z"
       },
       {
-        "id": "11",
+        "id": 11,
         "title": "Configure Pre-commit Hooks and CI Quality Gates",
         "description": "Update pre-commit configuration to run ruff, mypy, and pytest on commit, ensuring code quality gates are enforced.",
         "details": "Update `.pre-commit-config.yaml`:\n\n```yaml\nrepos:\n  - repo: https://github.com/pre-commit/pre-commit-hooks\n    rev: v4.6.0\n    hooks:\n      - id: trailing-whitespace\n      - id: end-of-file-fixer\n      - id: check-yaml\n      - id: check-added-large-files\n        args: ['--maxkb=500']  # Ensure CSV stays under 500KB\n      - id: check-toml\n  \n  - repo: https://github.com/astral-sh/ruff-pre-commit\n    rev: v0.4.4\n    hooks:\n      - id: ruff\n        args: [--fix, --exit-non-zero-on-fix]\n      - id: ruff-format\n  \n  - repo: local\n    hooks:\n      - id: block-main\n        name: Block direct commits to main/master\n        entry: bash -c 'branch=$(git symbolic-ref --short HEAD); if [ \"$branch\" = \"main\" ] || [ \"$branch\" = \"master\" ]; then echo \"❌ Commits diretos na $branch bloqueados.\"; exit 1; fi'\n        language: system\n        pass_filenames: false\n        always_run: true\n      \n      - id: mypy\n        name: Type check with mypy\n        entry: uv run mypy src/\n        language: system\n        pass_filenames: false\n        types: [python]\n      \n      - id: pytest\n        name: Run tests\n        entry: uv run pytest --cov --cov-fail-under=80 -q\n        language: system\n        pass_filenames: false\n        always_run: true\n```\n\nAdd ruff and mypy configuration to pyproject.toml:\n\n```toml\n[tool.ruff]\nline-length = 100\ntarget-version = \"py312\"\n\n[tool.ruff.lint]\nselect = [\"E\", \"F\", \"I\", \"N\", \"W\", \"UP\", \"B\", \"C4\", \"SIM\"]\nignore = [\"E501\"]  # Line length handled by formatter\n\n[tool.ruff.lint.isort]\nknown-first-party = [\"smart_hospitals\"]\n\n[tool.mypy]\npython_version = \"3.12\"\nstrict = true\nwarn_return_any = true\nwarn_unused_ignores = true\n\n[[tool.mypy.overrides]]\nmodule = [\"streamlit.*\", \"plotly.*\", \"mcp.*\"]\nignore_missing_imports = true\n\n[tool.pytest.ini_options]\naddopts = \"--cov=src/smart_hospitals --cov-report=term-missing\"\ntestpaths = [\"tests\"]\nasyncio_mode = \"auto\"\n```\n\nInstall pre-commit hooks:\n```bash\nuv run pre-commit install\n```",
@@ -663,7 +667,7 @@
         "expansionPrompt": "Break down pre-commit configuration into: 1) Update .pre-commit-config.yaml to add ruff-pre-commit hooks (ruff check with --fix, ruff-format); 2) Add local hooks for mypy (uv run mypy src/) and pytest (uv run pytest --cov --cov-fail-under=80); 3) Configure ruff and mypy in pyproject.toml with Python 3.12 target, appropriate lint rules, and ignore rules for third-party libraries. Verify with `uv run pre-commit run --all-files`."
       },
       {
-        "id": "12",
+        "id": 12,
         "title": "Write Documentation and README",
         "description": "Create comprehensive documentation explaining how to update the snapshot, run the dashboard locally, execute tests, and connect the MCP server to Claude Desktop or other MCP clients.",
         "details": "Update `README.md` with:\n\n```markdown\n# Smart Hospitals - Dashboard Epidemiológico Dengue SP\n\nDashboard e MCP server para monitoramento epidemiológico de dengue no município de São Paulo,\nusando dados públicos do InfoDengue.\n\n## Dashboard Publicado\n\n🔗 [Acessar Dashboard](https://your-app.streamlit.app)\n\n## Requisitos\n\n- Python 3.12+\n- [uv](https://github.com/astral-sh/uv) (gerenciador de pacotes)\n\n## Instalação\n\n```bash\n# Clone o repositório\ngit clone https://github.com/org/smart_hospitals.git\ncd smart_hospitals\n\n# Instale as dependências\nuv sync\n```\n\n## Atualizar Dados (Snapshot)\n\nO snapshot CSV é atualizado manualmente. Para baixar os dados mais recentes:\n\n```bash\nuv run python scripts/extract_infodengue.py\n```\n\nOs logs mostram o intervalo de semanas baixado. O arquivo `data/dengue_sp_snapshot.csv`\nserá sobrescrito com os dados atualizados.\n\n## Rodar Dashboard Localmente\n\n```bash\nuv run streamlit run src/smart_hospitals/dashboard/app.py\n```\n\nAcesse http://localhost:8501\n\n## Rodar Testes\n\n```bash\n# Rodar todos os testes com cobertura\nuv run pytest --cov\n\n# Rodar apenas testes do módulo de dados\nuv run pytest tests/data/\n\n# Rodar com verbose\nuv run pytest -v\n```\n\n## Conectar MCP Server ao Claude Desktop\n\n1. Inicie o MCP server:\n```bash\nuv run python -m smart_hospitals.mcp_server\n```\n\n2. Configure o Claude Desktop (`~/.config/claude/claude_desktop_config.json`):\n```json\n{\n  \"mcpServers\": {\n    \"dengue-sp\": {\n      \"command\": \"uv\",\n      \"args\": [\"run\", \"python\", \"-m\", \"smart_hospitals.mcp_server\"],\n      \"cwd\": \"/path/to/smart_hospitals\"\n    }\n  }\n}\n```\n\n3. Reinicie o Claude Desktop e verifique que as tools estão disponíveis:\n   - `situacao_atual()`: Situação epidemiológica atual\n   - `tendencia(semanas)`: Tendência das últimas N semanas\n   - `serie_historica(inicio, fim)`: Série histórica por período\n   - `comparativo_sazonal(semana)`: Comparação com anos anteriores\n\n## Exemplo de Uso do MCP\n\n**Pergunta:** \"Qual a tendência de casos de dengue para as próximas semanas?\"\n\n**Resposta do agente usando MCP:**\n> Consultei os dados epidemiológicos via MCP. A situação atual mostra:\n> - Rt = 1.4 (probabilidade de crescimento: 95%)\n> - Nível de alerta: Laranja\n> - Variação semanal: +35% de casos estimados\n> \n> A tendência é de **alta** nos casos de dengue. É sugerido antecipar as compras de medicamentos.\n\n## Estrutura do Projeto\n\n```\nsmart_hospitals/\n├── src/smart_hospitals/\n│   ├── data/           # Módulo de dados compartilhado\n│   ├── dashboard/      # Aplicação Streamlit\n│   └── mcp_server/     # MCP server (FastMCP)\n├── data/               # Snapshot CSV\n├── notebooks/          # Análise exploratória\n├── tests/              # Testes pytest\n├── scripts/            # Scripts auxiliares\n└── docs/               # Documentação\n```\n\n## Dados\n\nOs dados são obtidos da API pública do [InfoDengue](https://info.dengue.mat.br/):\n- Município: São Paulo (IBGE 3550308)\n- Doença: Dengue\n- Período: Semana epidemiológica 1/2010 até a mais recente\n- Atualização: Manual, sob demanda\n\n## Licença\n\n[MIT](LICENSE)\n```",
@@ -721,12 +725,14 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-10-23T13:57:15.488Z",
+      "lastModified": "2026-10-23T14:11:36.535Z",
       "taskCount": 12,
       "completedCount": 9,
       "tags": [
         "master"
-      ]
+      ],
+      "created": "2026-10-23T14:11:38.432Z",
+      "description": "Tasks for master context"
     }
   }
 }

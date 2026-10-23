@@ -168,7 +168,7 @@ async def test_logs_each_call_with_params_and_duration(
 async def test_unexpected_error_is_logged_and_not_leaked(
     monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture, error: Exception
 ) -> None:
-    """Só ParametroInvalido chega ao cliente; ValueError interno (ex. NaN) é falha do servidor."""
+    """Só ParametroInvalidoError chega ao cliente; ValueError interno (NaN) é falha do servidor."""
 
     def broken() -> pd.DataFrame:
         raise error

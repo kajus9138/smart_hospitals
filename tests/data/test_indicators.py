@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 
 from smart_hospitals.data.indicators import (
-    ParametroInvalido,
+    ParametroInvalidoError,
     calcular_situacao_atual,
     calcular_tendencia,
     comparativo_sazonal,
@@ -247,7 +247,7 @@ def test_indicadores_no_snapshot_versionado() -> None:
 def test_erros_de_parametro_sao_parametro_invalido(
     sample_dengue_data: pd.DataFrame, call: Callable[[pd.DataFrame], object]
 ) -> None:
-    with pytest.raises(ParametroInvalido):
+    with pytest.raises(ParametroInvalidoError):
         call(sample_dengue_data)
 
 
@@ -256,5 +256,5 @@ def test_erros_nos_dados_nao_sao_parametro_invalido(sample_dengue_data: pd.DataF
         calcular_situacao_atual(sample_dengue_data.assign(nivel=5))
     with pytest.raises(ValueError) as vazio:
         calcular_situacao_atual(sample_dengue_data.head(0))
-    assert not isinstance(nivel.value, ParametroInvalido)
-    assert not isinstance(vazio.value, ParametroInvalido)
+    assert not isinstance(nivel.value, ParametroInvalidoError)
+    assert not isinstance(vazio.value, ParametroInvalidoError)

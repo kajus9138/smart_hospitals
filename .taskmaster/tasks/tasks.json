@@ -628,17 +628,18 @@
           "1",
           "10"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
             "title": "Add ruff-pre-commit hooks to .pre-commit-config.yaml",
             "description": "Update the existing .pre-commit-config.yaml to include ruff-pre-commit repository with ruff check (--fix, --exit-non-zero-on-fix) and ruff-format hooks, plus check-toml and maxkb arg for large files.",
             "dependencies": [],
-            "details": "Add the ruff-pre-commit repository between pre-commit-hooks and local repos:\n\n1. Update pre-commit-hooks to add `check-toml` and `args: ['--maxkb=500']` to check-added-large-files\n2. Add ruff-pre-commit repo (rev: v0.4.4) with:\n   - `id: ruff` with `args: [--fix, --exit-non-zero-on-fix]`\n   - `id: ruff-format`\n\nThis ensures all Python files are linted and formatted before commit.",
-            "status": "pending",
+            "details": "Add the ruff-pre-commit repository between pre-commit-hooks and local repos:\n\n1. Update pre-commit-hooks to add `check-toml` and `args: ['--maxkb=500']` to check-added-large-files\n2. Add ruff-pre-commit repo (rev: v0.4.4) with:\n   - `id: ruff` with `args: [--fix, --exit-non-zero-on-fix]`\n   - `id: ruff-format`\n\nThis ensures all Python files are linted and formatted before commit.\n<info added on 2026-10-23T15:11:13.271Z>\nImplementation update: check-toml and --maxkb=500 args successfully added to pre-commit-hooks. Ruff configured with ruff-check hook (rev v0.17.1) including --fix --exit-non-zero-on-fix args. Deviated from original task spec: using current ruff-pre-commit v0.17.1 with hook id ruff-check instead of the suggested v0.4.4 with hook id ruff. Exclusions added for .taskmaster/ (trailing-whitespace, end-of-file-fixer) and uv.lock plus notebooks/analise_dengue_sp.ipynb (check-added-large-files). Known blockers: lint errors flagged by ruff-check and a file exceeding 586 KB are currently preventing commits until resolved.\n</info added on 2026-10-23T15:11:13.271Z>",
+            "status": "done",
             "testStrategy": "Run `uv run pre-commit run ruff --all-files` and `uv run pre-commit run ruff-format --all-files` to verify hooks execute correctly. Test with a file containing intentional lint errors to confirm --exit-non-zero-on-fix behavior.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-23T15:13:31.060Z"
           },
           {
             "id": 2,
@@ -647,25 +648,28 @@
             "dependencies": [
               1
             ],
-            "details": "In the local repo section of .pre-commit-config.yaml, add after block-main hook:\n\n1. mypy hook:\n   - id: mypy\n   - name: Type check with mypy\n   - entry: uv run mypy src/\n   - language: system\n   - pass_filenames: false\n   - types: [python]\n\n2. pytest hook:\n   - id: pytest\n   - name: Run tests\n   - entry: uv run pytest --cov --cov-fail-under=80 -q\n   - language: system\n   - pass_filenames: false\n   - always_run: true\n\nRemove the commented-out run-tests placeholder.",
-            "status": "pending",
+            "details": "In the local repo section of .pre-commit-config.yaml, add after block-main hook:\n\n1. mypy hook:\n   - id: mypy\n   - name: Type check with mypy\n   - entry: uv run mypy src/\n   - language: system\n   - pass_filenames: false\n   - types: [python]\n\n2. pytest hook:\n   - id: pytest\n   - name: Run tests\n   - entry: uv run pytest --cov --cov-fail-under=80 -q\n   - language: system\n   - pass_filenames: false\n   - always_run: true\n\nRemove the commented-out run-tests placeholder.\n<info added on 2026-10-23T15:11:34.267Z>\nLet me first analyze the current codebase to understand the pre-commit configuration and related files.Now I have full context about the current state of the pre-commit hooks and pyproject.toml configuration. Let me generate the update text based on the user's request:\n\nImplementation notes: mypy and pytest hooks already existed in .pre-commit-config.yaml (lines 32-44); run-tests was renamed to pytest. Minimum coverage threshold (80%) is configured via fail_under=80 in [tool.coverage.report] section of pyproject.toml (line 76), so --cov-fail-under flag is not duplicated in the hook entry. The hooks were not installed in .git/hooks; ran pre-commit install to activate them. Blockers encountered: one test is currently failing, and block-main hook prevents commits while on main branch.\n</info added on 2026-10-23T15:11:34.267Z>",
+            "status": "done",
             "testStrategy": "Run `uv run pre-commit run mypy --all-files` and `uv run pre-commit run pytest --all-files`. Verify mypy catches type errors and pytest enforces 80% coverage minimum.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-23T15:13:32.948Z"
           },
           {
             "id": 3,
             "title": "Configure ruff and mypy tools in pyproject.toml",
             "description": "Add or update pyproject.toml with ruff configuration (line-length, target-version, lint rules, isort settings) and mypy configuration (strict mode, Python 3.12, third-party ignore rules).",
             "dependencies": [],
-            "details": "Add the following tool configurations to pyproject.toml:\n\n1. [tool.ruff]:\n   - line-length = 100\n   - target-version = \"py312\"\n\n2. [tool.ruff.lint]:\n   - select = [\"E\", \"F\", \"I\", \"N\", \"W\", \"UP\", \"B\", \"C4\", \"SIM\"]\n   - ignore = [\"E501\"]\n\n3. [tool.ruff.lint.isort]:\n   - known-first-party = [\"smart_hospitals\"]\n\n4. [tool.mypy]:\n   - python_version = \"3.12\"\n   - strict = true\n   - warn_return_any = true\n   - warn_unused_ignores = true\n\n5. [[tool.mypy.overrides]]:\n   - module = [\"streamlit.*\", \"plotly.*\", \"mcp.*\"]\n   - ignore_missing_imports = true\n\n6. [tool.pytest.ini_options]:\n   - addopts = \"--cov=src/smart_hospitals --cov-report=term-missing\"\n   - testpaths = [\"tests\"]\n   - asyncio_mode = \"auto\"\n\nAfter configuration, run `uv run pre-commit install` to activate hooks.",
-            "status": "pending",
+            "details": "Add the following tool configurations to pyproject.toml:\n\n1. [tool.ruff]:\n   - line-length = 100\n   - target-version = \"py312\"\n\n2. [tool.ruff.lint]:\n   - select = [\"E\", \"F\", \"I\", \"N\", \"W\", \"UP\", \"B\", \"C4\", \"SIM\"]\n   - ignore = [\"E501\"]\n\n3. [tool.ruff.lint.isort]:\n   - known-first-party = [\"smart_hospitals\"]\n\n4. [tool.mypy]:\n   - python_version = \"3.12\"\n   - strict = true\n   - warn_return_any = true\n   - warn_unused_ignores = true\n\n5. [[tool.mypy.overrides]]:\n   - module = [\"streamlit.*\", \"plotly.*\", \"mcp.*\"]\n   - ignore_missing_imports = true\n\n6. [tool.pytest.ini_options]:\n   - addopts = \"--cov=src/smart_hospitals --cov-report=term-missing\"\n   - testpaths = [\"tests\"]\n   - asyncio_mode = \"auto\"\n\nAfter configuration, run `uv run pre-commit install` to activate hooks.\n<info added on 2026-10-23T15:12:00.273Z>\nThe configuration changes and N818 fix have been implemented. Here's the update summary:\n\nRuff configuration updated:\n- Added N (pep8-naming) and C4 (flake8-comprehensions) rule sets\n- Added isort known-first-party = [\"smart_hospitals\"]\n\nN818 violation fixed by renaming ParametroInvalido to ParametroInvalidoError across:\n- src/smart_hospitals/data/indicators.py (class definition, line 32)\n- src/smart_hospitals/data/__init__.py (import and __all__ export)\n- src/smart_hospitals/mcp_server/server.py (except clause, line 76)\n- tests/data/test_indicators.py (import and usages)\n- tests/mcp_server/test_server.py (docstring reference)\n- memories/decisoes/MCP server - implementacao e erros das tools.md (documentation updated)\n\nConfiguration items NOT applied per user feedback:\n- asyncio_mode = \"auto\" in pytest config: Project uses anyio, not asyncio\n- mypy overrides for streamlit.* and mcp.*: These libraries ship type stubs, so ignore_missing_imports is unnecessary\n</info added on 2026-10-23T15:12:00.273Z>",
+            "status": "done",
             "testStrategy": "Verify with `uv run ruff check .` and `uv run mypy .` that configurations are valid and applied. Run `uv run pre-commit run --all-files` to validate complete integration. Test that third-party imports (streamlit, plotly, mcp) don't cause mypy errors.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-10-23T15:13:34.846Z"
           }
         ],
         "complexity": 4,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down pre-commit configuration into: 1) Update .pre-commit-config.yaml to add ruff-pre-commit hooks (ruff check with --fix, ruff-format); 2) Add local hooks for mypy (uv run mypy src/) and pytest (uv run pytest --cov --cov-fail-under=80); 3) Configure ruff and mypy in pyproject.toml with Python 3.12 target, appropriate lint rules, and ignore rules for third-party libraries. Verify with `uv run pre-commit run --all-files`."
+        "expansionPrompt": "Break down pre-commit configuration into: 1) Update .pre-commit-config.yaml to add ruff-pre-commit hooks (ruff check with --fix, ruff-format); 2) Add local hooks for mypy (uv run mypy src/) and pytest (uv run pytest --cov --cov-fail-under=80); 3) Configure ruff and mypy in pyproject.toml with Python 3.12 target, appropriate lint rules, and ignore rules for third-party libraries. Verify with `uv run pre-commit run --all-files`.",
+        "updatedAt": "2026-10-23T15:13:34.846Z"
       },
       {
         "id": "12",
@@ -726,9 +730,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-10-23T15:01:45.406Z",
+      "lastModified": "2026-10-23T15:13:34.846Z",
       "taskCount": 12,
-      "completedCount": 10,
+      "completedCount": 11,
       "tags": [
         "master"
       ]

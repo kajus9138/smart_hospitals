@@ -11,6 +11,11 @@ Trend = Literal["alta", "estavel", "queda"]
 
 LEVEL_MAP: dict[int, AlertLevel] = {1: "verde", 2: "amarelo", 3: "laranja", 4: "vermelho"}
 
+# Limiares da tendência (calcular_tendencia), também usados nos medidores do dashboard.
+RT_ALTA = 1.1
+RT_QUEDA = 0.9
+P_RT1_ALTA = 0.7
+
 TENDENCIA_COLUMNS = ["SE", "data_iniSE", "casos_est", "Rt", "p_rt1", "nivel"]
 SERIE_COLUMNS = [
     "SE",
@@ -120,9 +125,9 @@ def calcular_tendencia(df: pd.DataFrame, semanas: int = 4) -> Tendencia:
     rt_medio = float(recent["Rt"].mean())
     p_rt1_medio = float(recent["p_rt1"].mean())
     tendencia: Trend
-    if rt_medio > 1.1 and p_rt1_medio > 0.7:
+    if rt_medio > RT_ALTA and p_rt1_medio > P_RT1_ALTA:
         tendencia = "alta"
-    elif rt_medio < 0.9:
+    elif rt_medio < RT_QUEDA:
         tendencia = "queda"
     else:
         tendencia = "estavel"

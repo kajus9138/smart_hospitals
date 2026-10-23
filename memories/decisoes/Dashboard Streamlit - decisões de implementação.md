@@ -24,6 +24,11 @@ Origem: task 6, `src/smart_hospitals/dashboard/` em 2026-10-23.
 - **Escala do medidor de Rt**: vai até `max(2, ceil(Rt))`. No snapshot, o Rt passa de 2 em 24 semanas (máx. 4,6).
 - **Sparkline**: mostra 12 semanas de `casos_est`, mas a tendência vem de `calcular_tendencia` (4 semanas, Rt/p_rt1).
   O título diz "tendência (4 sem.)" para não sugerir que a tendência foi calculada sobre as 12 semanas.
+- **Ajustes da revisão visual (2026-10-23)**: KPIs em grade 2x2 ao lado da sparkline, porque em 4 colunas os
+  rótulos eram cortados. O nível de alerta usa Markdown colorido no valor do `st.metric`
+  (`:color[Laranja]{foreground="#ef6c00"}`, Streamlit >= 1.55), com a mesma cor das faixas da série. Os títulos
+  dos medidores quebram linha e o gráfico tem margens laterais. A sparkline fica sem a barra de ferramentas, que
+  cobria o título.
 - **Delta dos casos com `delta_color="inverse"`**: aumento de casos aparece em vermelho.
 - `st.plotly_chart(fig, width="stretch")`: o `use_container_width` foi removido do Streamlit em 2026.
 - **Testes**: `AppTest.from_file` resolve caminho relativo a partir do arquivo de teste, por isso o teste usa caminho
@@ -46,6 +51,7 @@ Origem: task 6, `src/smart_hospitals/dashboard/` em 2026-10-23.
 - [decision] Figuras Plotly em charts.py (puras), layout em app.py #dashboard
 - [decision] Limiares de Rt/p_rt1 vivem em indicators.py e são reusados pelos medidores #indicadores
 - [decision] Eixo do medidor de Rt se estende além de 2 em surtos #visualizacao
+- [decision] Nível de alerta exibido na cor do alerta via Markdown no st.metric #dashboard
 - [fact] AppTest roda uma cópia temporária do script; coverage não mede app.py #testes
 - [fact] st.plotly_chart usa width="stretch"; use_container_width foi removido #streamlit
 

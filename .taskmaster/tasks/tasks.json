@@ -937,17 +937,18 @@
         "id": "16",
         "title": "Update README with Ontology Documentation",
         "description": "Add a section to README.md explaining what the ontology is, its purpose, and how to load it into an AI agent's context (system prompt or CLAUDE.md).",
-        "details": "Add a new section to README.md after the MCP server section:\n\n```markdown\n## Ontologia para agentes de IA\n\n`docs/ontologia/dengue_sp.yaml` documenta os conceitos, regras e achados da análise exploratória\npara que um agente de IA interprete as respostas do MCP com o mesmo entendimento do dashboard.\n\nO arquivo inclui:\n- **conceitos**: definições de indicadores (Rt, p_rt1, nowcast, níveis de alerta) com suas\n  colunas de origem e tools do MCP\n- **relações**: como os conceitos se conectam (ex.: Rt antecipa o crescimento de casos)\n- **regras**: limiares e mapeamentos iguais aos do código (tendência alta/estável/queda, níveis)\n- **achados**: fatos empíricos da análise (sazonalidade, anos de surto, atraso de notificação)\n- **orientações**: diretrizes para o agente responder (citar data de referência, usar nowcast\n  com intervalo, não fazer previsão numérica)\n\n### Carregar no contexto de um agente\n\n**Claude Code:** inclua o arquivo em `CLAUDE.md` ou em um arquivo referenciado por ele:\n\n```markdown\n# CLAUDE.md\n@./docs/ontologia/dengue_sp.yaml\n```\n\n**Claude Desktop ou outro cliente:** anexe o conteúdo ao system prompt ou inclua como arquivo\nde contexto, dependendo do cliente.\n\n### Atualizar a ontologia\n\nOs achados têm validade (`valido_ate_se`). Ao atualizar o snapshot para uma SE posterior, o\nteste `test_ontologia_validade_snapshot` falhará, obrigando a revisar os números da ontologia\nno mesmo PR. Isso garante que achados desatualizados não passem despercebidos.\n```\n\nPlace this section after \"MCP server\" and before \"Estrutura do projeto\".",
+        "details": "Add a new section to README.md after the MCP server section:\n\n```markdown\n## Ontologia para agentes de IA\n\n`docs/ontologia/dengue_sp.yaml` documenta os conceitos, regras e achados da análise exploratória\npara que um agente de IA interprete as respostas do MCP com o mesmo entendimento do dashboard.\n\nO arquivo inclui:\n- **conceitos**: definições de indicadores (Rt, p_rt1, nowcast, níveis de alerta) com suas\n  colunas de origem e tools do MCP\n- **relações**: como os conceitos se conectam (ex.: Rt antecipa o crescimento de casos)\n- **regras**: limiares e mapeamentos iguais aos do código (tendência alta/estável/queda, níveis)\n- **achados**: fatos empíricos da análise (sazonalidade, anos de surto, atraso de notificação)\n- **orientações**: diretrizes para o agente responder (citar data de referência, usar nowcast\n  com intervalo, não fazer previsão numérica)\n\n### Carregar no contexto de um agente\n\n**Claude Code:** inclua o arquivo em `CLAUDE.md` ou em um arquivo referenciado por ele:\n\n```markdown\n# CLAUDE.md\n@./docs/ontologia/dengue_sp.yaml\n```\n\n**Claude Desktop ou outro cliente:** anexe o conteúdo ao system prompt ou inclua como arquivo\nde contexto, dependendo do cliente.\n\n### Atualizar a ontologia\n\nOs achados têm validade (`valido_ate_se`). Ao atualizar o snapshot para uma SE posterior, o\nteste `test_ontologia_validade_snapshot` falhará, obrigando a revisar os números da ontologia\nno mesmo PR. Isso garante que achados desatualizados não passem despercebidos.\n```\n\nPlace this section after \"MCP server\" and before \"Estrutura do projeto\".\n<info added on 2026-11-04T17:38:18.669Z>\nBased on my analysis of the README.md, the ontology file, and the test file, here is the new information to append to the task details:\n\nImplementation notes based on current state:\n\n1. README section already exists at lines 229-274 with correct structure (six YAML sections: metadados, conceitos, relacoes, regras, achados, orientacoes_agente).\n\n2. The current README correctly documents the CLAUDE.md import syntax at lines 254-262, including the note that the path is relative to the importing file and that code blocks do not trigger imports.\n\n3. Project structure at line 288 already shows docs/ with ontologia reference: \"docs/ # ontologia para agentes, visualizações aprovadas e guia do fluxo de trabalho\".\n\n4. Verified test naming: the test is `test_validade_frente_ao_snapshot` (line 217 of tests/test_ontologia.py), not `test_ontologia_validade_snapshot`.\n\n5. Verified additional tests that break on snapshot update: `test_achado_cobertura_bate_com_snapshot` (lines 250-257) checks SE count/range, and `test_achado_atraso_notificacao_bate_com_ultima_semana` (lines 260-269) checks last week's values.\n\n6. The \"Atualizar a ontologia\" subsection (lines 267-274) now correctly mentions all three tests that break on snapshot update and the full list of items to revise.\n\n7. The \"Atualizar o snapshot de dados\" section (lines 42-55) includes a forward reference to the ontology update section and mentions the test failure.\n\n8. Validation results: pytest 148 passed, ruff and mypy clean.\n</info added on 2026-11-04T17:38:18.669Z>",
         "testStrategy": "Verify README.md renders correctly with the new section (use GitHub preview or markdown viewer). Check that the example CLAUDE.md reference syntax is correct. Verify the explanation matches the actual ontology file structure.",
         "priority": "medium",
         "dependencies": [
           "13"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [],
         "complexity": 3,
         "recommendedSubtasks": 0,
-        "expansionPrompt": "This is a straightforward documentation task that doesn't require expansion. Add a new README section explaining the ontology purpose, structure, usage in AI agents (Claude Code example with @./docs/ontologia/dengue_sp.yaml), and update workflow (validity check forcing review on snapshot updates)."
+        "expansionPrompt": "This is a straightforward documentation task that doesn't require expansion. Add a new README section explaining the ontology purpose, structure, usage in AI agents (Claude Code example with @./docs/ontologia/dengue_sp.yaml), and update workflow (validity check forcing review on snapshot updates).",
+        "updatedAt": "2026-11-04T17:42:11.871Z"
       },
       {
         "id": "17",
@@ -969,9 +970,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-11-04T14:40:59.979Z",
+      "lastModified": "2026-11-04T17:42:11.871Z",
       "taskCount": 17,
-      "completedCount": 15,
+      "completedCount": 16,
       "tags": [
         "master"
       ]

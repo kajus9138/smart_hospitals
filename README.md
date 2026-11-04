@@ -50,7 +50,9 @@ uv run python scripts/extract_infodengue.py   # opções: --output CAMINHO, --ey
 ```
 
 O script registra em stderr quantas semanas baixou, o intervalo de SEs e o tamanho do arquivo, e
-sobrescreve o CSV. Revise o diff do CSV e faça o commit.
+sobrescreve o CSV. Revise o diff do CSV e faça o commit. Um snapshot novo derruba os testes da
+ontologia, seja por trazer uma SE posterior à validade dela, seja porque o InfoDengue revisou as
+semanas recentes: revise os achados no mesmo PR (veja [Atualizar a ontologia](#atualizar-a-ontologia)).
 
 ### Módulo de dados
 
@@ -224,6 +226,68 @@ E a resposta fica assim:
 > estimados recuaram 13,6%: vale acompanhar as próximas semanas antes de concluir que a alta
 > perdeu força.
 
+## Ontologia para agentes de IA
+
+`docs/ontologia/dengue_sp.yaml` documenta os conceitos, regras e achados da análise exploratória
+para que um agente de IA interprete as respostas do MCP com o mesmo entendimento do dashboard: as
+tools trazem os valores atuais; a ontologia diz como lê-los.
+
+O arquivo tem seis seções:
+
+- **metadados**: fonte, município, arquivos de origem, `data_referencia` e `valido_ate_se` (a SE até
+  a qual os achados valem).
+- **conceitos**: definições dos indicadores (SE, casos notificados e estimados, Rt, p_rt1, intervalo
+  do nowcast, níveis de alerta, tendência, janela sazonal, entre outros), com a coluna do snapshot e
+  as tools do MCP que os expõem.
+- **relacoes**: como os conceitos se conectam (ex.: Rt antecipa o crescimento dos casos estimados).
+- **regras**: limiares e mapeamentos iguais aos de `src/smart_hospitals/data/indicators.py`
+  (tendência alta/estável/queda, níveis de alerta).
+- **achados**: fatos empíricos do notebook (cobertura da série, sazonalidade, anos de surto, atraso
+  de notificação), cada um com evidência, método, limitações e validade.
+- **orientacoes_agente**: diretrizes de resposta (citar a `data_referencia`, usar `casos_est` com
+  intervalo, não fazer previsão numérica, dizer "não informado" quando um valor vier `None`).
+
+### Carregar no contexto de um agente
+
+Use a ontologia junto com o [MCP server](#mcp-server): sem as tools, o agente não tem os valores
+atuais; sem a ontologia, não tem as regras para interpretá-los.
+
+**Claude Code:** importe o arquivo no `CLAUDE.md` (ou em um arquivo referenciado por ele):
+
+```markdown
+# CLAUDE.md
+@./docs/ontologia/dengue_sp.yaml
+```
+
+O caminho é relativo ao arquivo que faz o import. Dentro de crases ou de um bloco de código o `@` não
+importa nada: escreva a linha como texto normal.
+
+**Claude Desktop ou outro cliente:** anexe o arquivo à conversa (ou ao projeto) ou cole o conteúdo
+no system prompt, conforme o cliente permitir.
+
+### Atualizar a ontologia
+
+Os achados são estáticos e valem até a SE de `metadados.valido_ate_se`. `tests/test_ontologia.py`
+compara a ontologia com o código e com o snapshot:
+
+```bash
+uv run pytest tests/test_ontologia.py
+```
+
+Com um snapshot novo, falham `test_validade_frente_ao_snapshot` (SE mais recente posterior à
+validade) e os testes das evidências de `cobertura` e `atraso_notificacao`, que também quebram
+quando o InfoDengue revisa as semanas recentes sem mudar a última SE. No mesmo PR, revise os achados
+no notebook e atualize:
+
+- `data_referencia` e `valido_ate_se` dos metadados;
+- o `valido_ate_se` de cada achado e a SE citada nas orientações (os testes exigem que todos batam
+  com os metadados);
+- as evidências de todos os achados.
+
+Os testes só conferem as evidências que são leitura direta do snapshot (`cobertura` e
+`atraso_notificacao`); as de `surtos`, `sazonalidade`, `rt_antecipacao` e demais vêm do notebook e
+precisam ser recalculadas à mão. A falha de validade garante que essa revisão não seja esquecida.
+
 ## Estrutura do projeto
 
 ```
@@ -234,9 +298,9 @@ smart_hospitals/
 │   └── mcp_server/    # MCP server (stdio)
 ├── data/              # snapshot CSV do InfoDengue
 ├── notebooks/         # análise exploratória
-├── tests/             # pytest: data, dashboard, mcp_server, scripts, integration
+├── tests/             # pytest: data, dashboard, mcp_server, scripts, integration, ontologia
 ├── scripts/           # extract_infodengue.py e scripts do template (new-project.sh, setup.sh)
-├── docs/              # visualizações aprovadas e guia do fluxo de trabalho
+├── docs/              # ontologia para agentes, visualizações aprovadas e guia do fluxo de trabalho
 └── memories/          # decisões do projeto (Basic Memory)
 ```
 

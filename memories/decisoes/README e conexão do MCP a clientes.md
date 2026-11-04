@@ -6,7 +6,9 @@ tags:
 - decisao
 - documentacao
 - mcp
+- ontologia
 - task-12
+- task-16
 ---
 
 # README e conexão do MCP a clientes
@@ -31,6 +33,22 @@ inventado contradizia [[Indicadores de tendência sem previsão numérica]].
 - Chave `cwd` no config do Claude Desktop: não aparece na documentação oficial.
 - Manter o texto do template no topo do README: confundia quem chega ao repositório do projeto.
 - Adicionar LICENSE MIT: decisão do titular, fora do escopo da task.
+
+## Ontologia no README (task 16, PR #23, 2026-11-04)
+- Seção "Ontologia para agentes de IA" entre o exemplo de uso do MCP e a estrutura do projeto; carga no
+  Claude Code por `@./docs/ontologia/dengue_sp.yaml` no `CLAUDE.md` (sintaxe conferida via Context7:
+  caminho relativo ao arquivo que importa; crases e blocos de código não importam).
+- "Atualizar a ontologia" diz o que os testes cobrem e o que não: só as evidências de `cobertura` e
+  `atraso_notificacao` são conferidas contra o snapshot; as demais (surtos, sazonalidade, Rt) exigem
+  revisão manual no notebook. Revisões do InfoDengue nas semanas recentes quebram `atraso_notificacao`
+  mesmo sem SE nova.
+- Descartado: copiar o texto da task, que citava um teste inexistente (`test_ontologia_validade_snapshot`)
+  e prometia mais do que os testes garantem.
+
+## Lição: task-master update-task --append
+- O `--append` passa a nota pela IA do task-master, que a reescreve (incluiu números de linha do README) e
+  re-serializa o `tasks.json` (ids string ↔ int). Commitar o `tasks.json` em commit `chore` separado.
+- `update-subtask` falha em task sem subtarefas; nesses casos usar `update-task --append`.
 
 ## Observations
 - [decision] Claude Desktop sobe o servidor com `uv --directory <caminho> run dengue-mcp` #mcp

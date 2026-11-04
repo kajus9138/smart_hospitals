@@ -25,7 +25,8 @@ conceitos:
     rotulo: Semana epidemiológica (SE)
     definicao: >-
       Semana de domingo a sábado, no formato AAAASS (ex.: 202640). data_iniSE é o domingo
-      de início. Um ano tem 52 ou 53 SEs.
+      de início. Um ano tem 52 ou 53 SEs. situacao_atual devolve só data_iniSE, como
+      data_referencia.
     faixa: SE 1 a 53 em cada ano
     coluna: [SE, data_iniSE]
     tools: [situacao_atual, tendencia, serie_historica, comparativo_sazonal]
@@ -81,7 +82,9 @@ conceitos:
     tools: [situacao_atual, tendencia, serie_historica]
   - id: incidencia_100k
     rotulo: Incidência por 100 mil habitantes
-    definicao: Casos da semana por 100 mil habitantes, calculada pelo InfoDengue.
+    definicao: >-
+      Casos estimados (casos_est) da semana por 100 mil habitantes, calculada pelo
+      InfoDengue. Já incorpora a correção do atraso; não corrija de novo.
     unidade: casos/100 mil hab./semana
     coluna: [p_inc100k]
     tools: [situacao_atual]
@@ -124,7 +127,7 @@ relacoes:
   - {de: tendencia, tipo: derivada_de, para: probabilidade_rt_maior_que_1}
   - {de: ano_de_surto, tipo: classifica, para: ano}
   - {de: nivel_de_alerta, tipo: classifica, para: semana_epidemiologica}
-  - {de: incidencia_100k, tipo: normaliza, para: casos_notificados}
+  - {de: incidencia_100k, tipo: normaliza, para: casos_estimados}
   - {de: comparativo_sazonal, tipo: compara, para: casos_estimados}
   - {de: janela_sazonal, tipo: agrupa, para: semana_epidemiologica}
   - {de: atraso_de_notificacao, tipo: afeta, para: casos_notificados}
@@ -132,14 +135,14 @@ relacoes:
 # Regras determinísticas, iguais às do módulo de dados (src/smart_hospitals/data/indicators.py).
 regras:
   - id: tendencia_alta
-    descricao: Tendência de alta nas últimas semanas.
-    expressao: "media(Rt, 4) > 1.1 e media(p_rt1, 4) > 0.7"
-    parametros: {semanas: 4, rt_alta: 1.1, p_rt1_alta: 0.7}
+    descricao: Tendência de alta nas últimas N semanas (parâmetro semanas da tool, padrão 4).
+    expressao: "media(Rt, N) > 1.1 e media(p_rt1, N) > 0.7"
+    parametros: {semanas_padrao: 4, rt_alta: 1.1, p_rt1_alta: 0.7}
     referencia_codigo: calcular_tendencia (RT_ALTA, P_RT1_ALTA)
   - id: tendencia_queda
     descricao: Tendência de queda, avaliada só se não for alta.
-    expressao: "media(Rt, 4) < 0.9"
-    parametros: {semanas: 4, rt_queda: 0.9}
+    expressao: "media(Rt, N) < 0.9"
+    parametros: {semanas_padrao: 4, rt_queda: 0.9}
     referencia_codigo: calcular_tendencia (RT_QUEDA)
   - id: tendencia_estavel
     descricao: Qualquer caso que não seja alta nem queda.
@@ -157,6 +160,9 @@ regras:
   - id: variacao_semanal
     descricao: Variação percentual de casos_est frente à semana anterior (não usa notificados).
     expressao: "(casos_est[t] - casos_est[t-1]) / casos_est[t-1] * 100"
+    excecao: >-
+      Vale 0.0 quando casos_est[t-1] <= 0 ou só há uma semana; nesse caso 0.0 não
+      significa estabilidade.
     referencia_codigo: calcular_situacao_atual
   - id: intervalo_nowcast
     descricao: Só há intervalo de incerteza onde casos_est_max > casos_est_min.
@@ -195,7 +201,7 @@ achados:
     implicacao: Apresente a incerteza só nas semanas recentes; o intervalo se alarga na última SE.
   - id: surtos
     afirmacao: >-
-      Seis anos foram de surto; 2024 ficou uma ordem de grandeza acima dos demais.
+      Seis anos foram de surto; 2024 foi de longe o maior, com 1,26 milhão de casos estimados.
     evidencia:
       limiar_casos_ano: 46406
       anos_de_surto: [2014, 2015, 2019, 2023, 2024, 2025]
@@ -203,7 +209,9 @@ achados:
     metodo: Total anual de casos_est; limiar de 2× a mediana anual dos anos completos.
     origem: notebook, seções 1 e 2
     valido_ate_se: 202640
-    limitacoes: Limiar definido na análise exploratória, não é critério oficial de epidemia.
+    limitacoes: >-
+      Limiar definido na análise exploratória, não é critério oficial de epidemia. Só anos
+      completos são classificados; 2026 é parcial e fica de fora.
     implicacao: >-
       Médias históricas são puxadas por 2024; ao comparar com o histórico, mencione que
       anos de surto inflam a média.

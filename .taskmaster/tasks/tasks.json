@@ -834,7 +834,7 @@
           "13",
           "15"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -842,9 +842,10 @@
             "description": "Create test functions that validate the ontology file structure: valid YAML format, presence of all required sections (metadados, conceitos, relacoes, regras, achados, orientacoes_agente), and uniqueness of IDs within each section.",
             "dependencies": [],
             "details": "Create `tests/test_ontologia.py` with the ONTOLOGIA_PATH constant and three test functions: `test_ontologia_carrega_yaml_valido()` to verify the file loads as valid YAML dict, `test_ontologia_secoes_obrigatorias()` to assert all six required sections exist, and `test_ontologia_ids_unicos()` to extract and verify no duplicate IDs exist within conceitos, regras, and achados sections. Use yaml.safe_load() and standard assertions.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run `uv run pytest tests/test_ontologia.py::test_ontologia_carrega_yaml_valido tests/test_ontologia.py::test_ontologia_secoes_obrigatorias tests/test_ontologia.py::test_ontologia_ids_unicos -v`. Intentionally corrupt YAML syntax and verify test_ontologia_carrega_yaml_valido fails. Remove a required section and verify test_ontologia_secoes_obrigatorias fails. Add duplicate IDs and verify test_ontologia_ids_unicos fails.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-11-04T14:35:30.289Z"
           },
           {
             "id": 2,
@@ -854,9 +855,10 @@
               1
             ],
             "details": "Implement `test_relacoes_apontam_para_conceitos_definidos()` in `tests/test_ontologia.py`. Parse the ontology YAML, extract all concept IDs from the conceitos section into a set, then iterate through all relations in the relacoes section and verify that both 'de' and 'para' fields reference IDs that exist in the concept set. Assert with clear error messages indicating which relation references an undefined concept.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run `uv run pytest tests/test_ontologia.py::test_relacoes_apontam_para_conceitos_definidos -v`. Intentionally add a relation with 'de' or 'para' pointing to a non-existent concept ID and verify the test fails with a clear assertion error. Restore correct values and verify test passes.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-11-04T14:35:32.227Z"
           },
           {
             "id": 3,
@@ -866,9 +868,10 @@
               1
             ],
             "details": "Implement `test_ontologia_limiares_batem_com_codigo()` in `tests/test_ontologia.py`. Import RT_ALTA, RT_QUEDA, P_RT1_ALTA from smart_hospitals.data.indicators. Parse the regras section, locate the tendencia_alta and tendencia_queda rules, extract their threshold values, and assert: RT_ALTA matches the rt_threshold in tendencia_alta (1.1), RT_QUEDA matches the rt_threshold in tendencia_queda (0.9), and P_RT1_ALTA matches the probabilidade_threshold in tendencia_alta (0.7).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run `uv run pytest tests/test_ontologia.py::test_ontologia_limiares_batem_com_codigo -v`. Intentionally change RT_ALTA from 1.1 to 1.2 in the ontology YAML and verify the test fails. Restore the correct value and verify the test passes. This ensures the test correctly detects mismatches between code and ontology.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-11-04T14:35:34.180Z"
           },
           {
             "id": 4,
@@ -878,9 +881,10 @@
               1
             ],
             "details": "Implement `test_ontologia_mapeamento_niveis()` in `tests/test_ontologia.py`. Import LEVEL_MAP from smart_hospitals.data.indicators. Parse the ontology to find the level mapping section (likely in metadados or a dedicated section), extract the mapping of level numbers to color names (1: verde, 2: amarelo, 3: laranja, 4: vermelho), and assert it matches LEVEL_MAP exactly. Handle different possible locations of this mapping in the ontology structure.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run `uv run pytest tests/test_ontologia.py::test_ontologia_mapeamento_niveis -v`. Intentionally change one color mapping (e.g., change level 2 from amarelo to azul) and verify the test fails. Restore correct mapping and verify test passes.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-11-04T14:35:36.137Z"
           },
           {
             "id": 5,
@@ -890,9 +894,10 @@
               1
             ],
             "details": "Implement `test_ontologia_colunas_existem_no_snapshot()` and `test_ontologia_tools_existem_no_mcp()` in `tests/test_ontologia.py`. For columns: import REQUIRED_COLUMNS from smart_hospitals.data.loader, extract all 'coluna' fields from conceitos, verify each is in REQUIRED_COLUMNS. For tools: define VALID_TOOLS = [\"situacao_atual\", \"tendencia\", \"serie_historica\", \"comparativo_sazonal\"], extract all 'tools' fields from conceitos, verify each tool is in VALID_TOOLS.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run `uv run pytest tests/test_ontologia.py::test_ontologia_colunas_existem_no_snapshot tests/test_ontologia.py::test_ontologia_tools_existem_no_mcp -v`. Add a non-existent column name to a conceito and verify the column test fails. Add an invalid tool name and verify the tool test fails. Restore correct values and verify both tests pass.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-11-04T14:35:38.079Z"
           },
           {
             "id": 6,
@@ -901,15 +906,17 @@
             "dependencies": [
               1
             ],
-            "details": "Implement `test_ontologia_validade_snapshot()` and `test_ontologia_tamanho_maximo()` in `tests/test_ontologia.py`. For validity: import load_snapshot from smart_hospitals.data, load the snapshot, extract the most recent SE value, parse the ontology to get metadados.valido_ate_se, assert latest_se <= valido_ate_se with a clear message about revising achados before updating snapshot. For size: use ONTOLOGIA_PATH.stat().st_size and assert it's <= 20 * 1024 bytes.",
-            "status": "pending",
+            "details": "Implement `test_ontologia_validade_snapshot()` and `test_ontologia_tamanho_maximo()` in `tests/test_ontologia.py`. For validity: import load_snapshot from smart_hospitals.data, load the snapshot, extract the most recent SE value, parse the ontology to get metadados.valido_ate_se, assert latest_se <= valido_ate_se with a clear message about revising achados before updating snapshot. For size: use ONTOLOGIA_PATH.stat().st_size and assert it's <= 20 * 1024 bytes.\n<info added on 2026-11-04T14:35:59.702Z>\nThe test file has been implemented with 23 tests as mentioned. Let me verify the test count and other implementation details.\n\nImplementation complete: tests/test_ontologia.py has 23 tests covering structure (6 tests including parametrized), relations (1), code consistency (9), and validity/size (4). Uses module-scoped fixtures, ONTOLOGIA_PATH derived from __file__, and imports TOOLS from tests.mcp_helpers. Key extras implemented: expressao assertions check literal threshold values from code (RT_ALTA, P_RT1_ALTA, RT_QUEDA), semanas_padrao verified via inspect.signature on calcular_tendencia default, faixa tests compare against LEVEL_MAP values and Trend type args, referencia_codigo names validated against indicators module attributes, achados.valido_ate_se must match metadados.valido_ate_se, and data_referencia verified against data_iniSE of the validity SE. Mutation testing confirmed detection of: rt_alta 1.2 in ontologia vs RT_ALTA 1.2 in code, LEVEL_MAP with nível 5, non-existent relation/column/tool references, and valido_ate_se 202639. Full test suite passes (143 tests, 99% coverage), ruff and mypy clean.\n</info added on 2026-11-04T14:35:59.702Z>",
+            "status": "done",
             "testStrategy": "Run `uv run pytest tests/test_ontologia.py::test_ontologia_validade_snapshot tests/test_ontologia.py::test_ontologia_tamanho_maximo -v`. To test validity: temporarily modify valido_ate_se to an earlier SE than the snapshot's latest and verify test fails. For size: if the file grows beyond 20KB in the future, this test will catch it. Verify both tests pass with current data.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-11-04T14:35:40.048Z"
           }
         ],
         "complexity": 6,
         "recommendedSubtasks": 6,
-        "expansionPrompt": "Organize tests into logical groups matching the test strategy: 1) Implement structure validation tests (valid YAML, required sections, unique IDs), 2) Implement relational integrity tests (relations reference defined concepts), 3) Implement code consistency tests for thresholds (RT_ALTA, RT_QUEDA, P_RT1_ALTA match indicators.py), 4) Implement LEVEL_MAP consistency test, 5) Implement column and tool validation tests (columns exist in REQUIRED_COLUMNS, tools exist in MCP), 6) Implement snapshot validity and file size tests. Each subtask produces 1-3 test functions with clear assertions."
+        "expansionPrompt": "Organize tests into logical groups matching the test strategy: 1) Implement structure validation tests (valid YAML, required sections, unique IDs), 2) Implement relational integrity tests (relations reference defined concepts), 3) Implement code consistency tests for thresholds (RT_ALTA, RT_QUEDA, P_RT1_ALTA match indicators.py), 4) Implement LEVEL_MAP consistency test, 5) Implement column and tool validation tests (columns exist in REQUIRED_COLUMNS, tools exist in MCP), 6) Implement snapshot validity and file size tests. Each subtask produces 1-3 test functions with clear assertions.",
+        "updatedAt": "2026-11-04T14:37:47.988Z"
       },
       {
         "id": "15",
@@ -962,7 +969,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-11-04T14:29:42.023Z",
+      "lastModified": "2026-11-04T14:37:47.988Z",
       "taskCount": 17,
       "completedCount": 14,
       "tags": [
